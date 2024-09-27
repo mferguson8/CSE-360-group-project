@@ -1,1 +1,1 @@
-# CSE-360
+# Student Help Application
