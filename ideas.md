@@ -7,8 +7,10 @@
 
 ## User
 Student
+
 Admin
-Student adn admin
+
+Student and admin
 
 # Deliverables
 ## Phase 1
