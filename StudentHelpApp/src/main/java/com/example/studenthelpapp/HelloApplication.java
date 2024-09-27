@@ -16,8 +16,8 @@ public class HelloApplication extends Application {
     }
 
     public void start(Stage primaryStage) {
-    	System.out.println("ASU Hello World!");
-    	System.out.println("It started!");
+        Email test = Email.make_email("test@test");
+        System.out.println(test.to_string());
         primaryStage.setTitle("ASU Hello World Spring 2024");
         Button btn = new Button();
         btn.setText("Display: 'ASU says: Hello World!'");
