@@ -16,11 +16,12 @@ public class HelloApplication extends Application {
     }
 
     public void start(Stage primaryStage) {
-        //String test_txt = "testtest";
+        //String test_txt = "test@@test";
         //System.out.println("test_txt: " + test_txt);
-        //Email test = Email.make_email(test_txt);
-        //if (test != null) System.out.println(test.to_string());
-        //else System.out.println("Got null");
+        //Email.EmailResult er = Email.make_email(test_txt);
+        //Email.EmailResult.Status ers = er.check();
+        //if (ers == Email.EmailResult.Status.SUCCESS) System.out.println(er.get_email().to_string());
+        //else System.out.println(Email.EmailResult.parse_status(ers));
 
         primaryStage.setTitle("ASU Hello World Spring 2024");
         Button btn = new Button();
