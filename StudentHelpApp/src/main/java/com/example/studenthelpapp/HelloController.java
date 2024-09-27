@@ -1,4 +1,4 @@
-package com.example.studenhelpapp;
+package com.example.studenthelpapp;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
