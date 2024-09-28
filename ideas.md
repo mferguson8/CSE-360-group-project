@@ -1,5 +1,5 @@
 # Security
-- passoword hashing (by/during phase 3)
+- password hashing (by/during phase 3)
 - anti SQL injection
 
 # Classes
@@ -9,10 +9,37 @@
 - Student
 - Admin
 - Student and admin
-- Intructor
+- Instructor
 - Admin and Instructor?
 - Student and Instructor?
 - Student, Instructor, and  Admin?
+
+### Data
+- username
+- password
+- email
+- role(s)
+
+#### Name
+- first
+- middle
+- last
+- preferred
+
+### LoginUser
+An established user logging in
+- username
+- salts and hashes password, before querying database
+- checks if new/unestablished user?
+
+### SetupUser
+A user finishing the setup of the account
+- Takes in name data
+- Takes in and verifies email
+
+### ActiveUser
+An active user
+- role
 
 ### Admin Actions
 - delete account (requires confirmation/"are you sure?")
