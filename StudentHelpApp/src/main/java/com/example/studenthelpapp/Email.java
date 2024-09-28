@@ -11,11 +11,15 @@ public class Email {
         if (input.indexOf('@', at + 1) != -1) {
             return EmailResult.make_invalid(EmailResult.Status.MULT_ATS);
         } //multiple @s
+        String dom = input.substring(at+1, input.length());
         Email em = new Email(
             input.substring(0, at),
-            input.substring(at+1, input.length())
+            dom
         );
-        return EmailResult.make_valid(EmailResult.Status.SUCCESS, em);
+        return EmailResult.make_valid(
+            verify_domain(dom),
+            em
+        );
     }
 
     private Email(String u, String d) {
@@ -25,6 +29,12 @@ public class Email {
 
     public String to_string() {return this.username + "@" + this.domain;}
 
+    private static EmailResult.Status verify_domain(String dom) {
+       if (-1 == dom.indexOf('.')) return EmailResult.Status.INV_DOM;
+       return EmailResult.Status.SUCCESS;
+
+    }
+
     public static class EmailResult {
         Status status;
         boolean checked = false;
@@ -33,6 +43,7 @@ public class Email {
         public static enum Status {
             NO_DOM, //no domain
             MULT_ATS, //multiple ats
+            INV_DOM, //invalid domain (no separating periods)
             SUCCESS
         }
 
@@ -68,6 +79,8 @@ public class Email {
                     return "No @s, no domain";
                 case MULT_ATS:
                     return "Too many @s";
+                case INV_DOM:
+                    return "No mail server or top level domain";
             }
             return "Null status";
         }

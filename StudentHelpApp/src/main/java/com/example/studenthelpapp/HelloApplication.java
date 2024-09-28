@@ -16,7 +16,7 @@ public class HelloApplication extends Application {
     }
 
     public void start(Stage primaryStage) {
-        //String test_txt = "test@@test";
+        //String test_txt = "test@test.com";
         //System.out.println("test_txt: " + test_txt);
         //Email.EmailResult er = Email.make_email(test_txt);
         //Email.EmailResult.Status ers = er.check();
