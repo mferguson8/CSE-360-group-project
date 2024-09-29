@@ -32,6 +32,9 @@ An established user logging in
 - salts and hashes password, before querying database
 - checks if new/unestablished user?
 
+#### Salt generation
+use username and raw password to set seed, and generate "random" salt
+
 ### SetupUser
 A user finishing the setup of the account
 - Takes in name data

@@ -27,7 +27,7 @@ public class Email {
         this.domain = d;
     }
 
-    public String to_string() {return this.username + "@" + this.domain;}
+    public String toString() {return this.username + "@" + this.domain;}
 
     private static EmailResult.Status verify_domain(String dom) {
        if (-1 == dom.indexOf('.')) return EmailResult.Status.INV_DOM;
