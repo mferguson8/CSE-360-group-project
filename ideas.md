@@ -39,12 +39,17 @@ A user finishing the setup of the account
 
 ### ActiveUser
 An active user
-- role
+- user ID
+
+#### Role
+Turn role into boolean indicating ability to perform a given action
+
 
 ### Admin Actions
 - delete account (requires confirmation/"are you sure?")
 - add/remove roles
 - log out
+
 
 #### Invite
 - one time code
@@ -87,7 +92,9 @@ An active user
 - Account creation
 - Testing
 
-
+#### Input verification
+- anti-SQL injection
+- well formed input
 
 ### Screencasts
 - Technical
