@@ -11,30 +11,24 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+	private int i = 0;
+	private GUIController gui;
     public static void main(String[] args) {
         launch(args);
     }
 
     public void start(Stage primaryStage) {
-        //String test_txt = "test@test.com";
-        //System.out.println("test_txt: " + test_txt);
-        //Email.EmailResult er = Email.make_email(test_txt);
-        //Email.EmailResult.Status ers = er.check();
-        //if (ers == Email.EmailResult.Status.SUCCESS) System.out.println(er.get_email().to_string());
-        //else System.out.println(Email.EmailResult.parse_status(ers));
-
-        primaryStage.setTitle("ASU Hello World Spring 2024");
-        Button btn = new Button();
-        btn.setText("Display: 'ASU says: Hello World!'");
-        btn.setOnAction(new EventHandler<>() {
-            public void handle(ActionEvent event) {
-                System.out.println("ASU: Hello World!");
-            }
-        });
-
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-        primaryStage.setScene(new Scene(root, 300, 250));
-        primaryStage.show();
+    	System.out.println("ASU Hello World!");
+    	System.out.println("It started!");
+        gui = new GUIController();
+        gui.initialize(primaryStage, this);
+        
+    }
+    
+    public void onButtonPressed() { //Called by GUIController when someone presses the button
+    	i++;
+    	gui.setTitle(String.valueOf(i));
+    	System.out.println("Button Pressed!");
+    	
     }
 }
