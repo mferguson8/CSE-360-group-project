@@ -1,4 +1,4 @@
-//package com.example.studenthelpapp;
+package com.example.studenthelpapp;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -15,9 +15,9 @@ public class HelloApplication extends Application {
         launch(args);
     }
 
-    public void start(Stage primaryStage) {
-    	System.out.println("ASU Hello World!");
-    	System.out.println("It started!");
+    public void start(@SuppressWarnings("exports") Stage primaryStage) {
+        System.out.println("ASU Hello World!");
+        System.out.println("It started!");
         primaryStage.setTitle("ASU Hello World Spring 2024");
         Button btn = new Button();
         btn.setText("Display: 'ASU says: Hello World!'");
