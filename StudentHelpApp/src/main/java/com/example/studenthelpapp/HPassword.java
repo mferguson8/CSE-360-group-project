@@ -1,14 +1,12 @@
-import java.util.Random;
-
 public class HPassword { //hashed password
-    final static String SALT = "iamsalt";
-
     String password;
 
-    public static HPassword hashSalt(String rawPswd) { //hashes and salts a password
+    public static HPassword hashSalt(String rawPswd, String saltSeed) { //hashes and salts a password
         //TODO this function MUST be modified by Phase 3
         //This should NOT sotre actual password in memory
-        return new HPassword(rawPswd + SALT);
+        final RngStrGen rsg = new RngStrGen(true, true, true);
+        final String SALT = rsg.seededGenerate(rawPswd.length(), saltSeed);
+        return new HPassword(rawPswd);
     }
 
     private HPassword(String pswd) {
@@ -25,19 +23,14 @@ public class HPassword { //hashed password
         String otp;
 
         final static int OTPL= 8; // one time password length
+        final static RngStrGen RSG = new RngStrGen(true, false, false);
+        final static String OTP_SALT = "i am a salt";
 
         // for more divers character sets in otps
         //static boolean aryGened = false;
         //static int[] otpc = []; //one time password characters
         public static OTP getOTP() {
-            StringBuilder notp = new StringBuilder("");
-            Random rng = new Random();
-
-            for (int fv = 0; fv < OTPL; fv++) {
-                notp.append((char)(rng.nextInt(10) + 48)); //[0,10), ascii numbers 48-57 : 0-9
-            }
-
-            return new OTP(notp.toString());
+            return new OTP(RSG.generate(OTPL));
 
         }
 
@@ -46,7 +39,7 @@ public class HPassword { //hashed password
         }
 
         public String get() {return this.otp;}
-        public HPassword toHashed() {return HPassword.hashSalt(this.otp);}
+        public HPassword toHashed() {return HPassword.hashSalt(this.otp, OTP_SALT);}
 
     }
 
