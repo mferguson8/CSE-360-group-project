@@ -17,6 +17,7 @@ public class HelloApplication extends Application {
         launch(args);
     }
 
+
     public void start(Stage primaryStage) {
     	System.out.println("ASU Hello World!");
     	System.out.println("It started!");
@@ -30,5 +31,6 @@ public class HelloApplication extends Application {
     	gui.setTitle(String.valueOf(i));
     	System.out.println("Button Pressed!");
     	
+
     }
 }
