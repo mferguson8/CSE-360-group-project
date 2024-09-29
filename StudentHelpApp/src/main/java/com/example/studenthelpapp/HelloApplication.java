@@ -18,7 +18,7 @@ public class HelloApplication extends Application {
     }
 
 
-    public void start(Stage primaryStage) {
+    public void start(@SuppressWarnings("exports") Stage primaryStage) {
     	System.out.println("ASU Hello World!");
     	System.out.println("It started!");
         gui = new GUIController();
