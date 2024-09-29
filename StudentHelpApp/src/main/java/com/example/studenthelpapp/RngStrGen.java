@@ -48,4 +48,35 @@ public class RngStrGen {// random string generation
 
         return neo.toString();
     }
+
+    private static long StrToSeed(String sseed) {
+        long lseed = 0;
+        for (int fv = 0; fv < sseed.length(); fv++) {
+            lseed += (sseed.charAt(fv) << (fv % 56)) - fv;
+        }
+
+        return lseed;
+    }
+
+    public String seededGenerate(int length, String seed) {
+        StringBuilder neo = new StringBuilder("");
+        Random rng = new Random(StrToSeed(seed));
+
+        for (int fv = 0; fv < length; fv++) {
+            neo.append(bag[rng.nextInt(bag.length)]);
+        }
+
+        return neo.toString();
+    }
+
+    public String seededGenerate(int length, long seed) {
+        StringBuilder neo = new StringBuilder("");
+        Random rng = new Random(seed);
+
+        for (int fv = 0; fv < length; fv++) {
+            neo.append(bag[rng.nextInt(bag.length)]);
+        }
+
+        return neo.toString();
+    }
 }
