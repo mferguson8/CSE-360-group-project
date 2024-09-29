@@ -1,12 +1,10 @@
+import java.util.Random;
 public class RngStrGen {// random string generation
     //for salt and otp generation
 
     private char[] bag = {};
-    private int length = 4;
 
-    public RngStrGen(int len, boolean numbers, boolean upper, boolean lower) {
-        this.length = len;
-
+    public RngStrGen(boolean numbers, boolean upper, boolean lower) {
         int llen = 0; //length len
         llen += numbers ? 10 : 0;
         llen += upper ? 26 : 0;
@@ -38,5 +36,16 @@ public class RngStrGen {// random string generation
             }
         }
 
+    }
+
+    public String generate(int length) {
+        StringBuilder neo = new StringBuilder("");
+        Random rng = new Random();
+
+        for (int fv = 0; fv < length; fv++) {
+            neo.append(bag[rng.nextInt(bag.length)]);
+        }
+
+        return neo.toString();
     }
 }
