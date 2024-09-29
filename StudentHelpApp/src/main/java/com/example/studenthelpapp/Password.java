@@ -12,4 +12,10 @@ public class Password {
         this.password = pswd;
     }
 
+    public String getHashed() {return this.password;}
+
+    public static boolean areEqual(String pswdA, String pswdB) { //perhaps unnecessary
+        return pswdA.equals(pswdB);
+    }
+
 }
