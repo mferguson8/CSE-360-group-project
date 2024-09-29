@@ -1,11 +1,11 @@
 public class HPassword { //hashed password
     String password;
 
-    public static HPassword hashSalt(String rawPswd, String saltSeed) { //hashes and salts a password
+    public static HPassword hashSalt(String rawPswd) { //hashes and salts a password
         //TODO this function MUST be modified by Phase 3
-        //This should NOT sotre actual password in memory
+        //This should NOT store actual password in memory
         final RngStrGen rsg = new RngStrGen(true, true, true);
-        final String SALT = rsg.seededGenerate(rawPswd.length(), saltSeed);
+        final String SALT = rsg.seededGenerate(rawPswd.length(), 0);
         return new HPassword(rawPswd);
     }
 
@@ -24,7 +24,6 @@ public class HPassword { //hashed password
 
         final static int OTPL= 8; // one time password length
         final static RngStrGen RSG = new RngStrGen(true, false, false);
-        final static String OTP_SALT = "i am a salt";
 
         // for more divers character sets in otps
         //static boolean aryGened = false;
@@ -39,7 +38,7 @@ public class HPassword { //hashed password
         }
 
         public String get() {return this.otp;}
-        public HPassword toHashed() {return HPassword.hashSalt(this.otp, OTP_SALT);}
+        public HPassword toHashed() {return HPassword.hashSalt(this.otp);}
 
     }
 

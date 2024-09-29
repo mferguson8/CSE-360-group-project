@@ -70,6 +70,9 @@ public class RngStrGen {// random string generation
     }
 
     public String seededGenerate(int length, long seed) {
+        if (seed == 0) {
+            return this.generate(length);
+        }
         StringBuilder neo = new StringBuilder("");
         Random rng = new Random(seed);
 
