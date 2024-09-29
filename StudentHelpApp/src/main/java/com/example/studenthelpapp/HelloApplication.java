@@ -11,6 +11,8 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+	private int i = 0;
+	private GUIController gui;
     public static void main(String[] args) {
         launch(args);
     }
@@ -18,18 +20,15 @@ public class HelloApplication extends Application {
     public void start(Stage primaryStage) {
     	System.out.println("ASU Hello World!");
     	System.out.println("It started!");
-        primaryStage.setTitle("ASU Hello World Spring 2024");
-        Button btn = new Button();
-        btn.setText("Display: 'ASU says: Hello World!'");
-        btn.setOnAction(new EventHandler<>() {
-            public void handle(ActionEvent event) {
-                System.out.println("ASU: Hello World!");
-            }
-        });
-
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-        primaryStage.setScene(new Scene(root, 300, 250));
-        primaryStage.show();
+        gui = new GUIController();
+        gui.initialize(primaryStage, this);
+        
+    }
+    
+    public void onButtonPressed() { //Called by GUIController when someone presses the button
+    	i++;
+    	gui.setTitle(String.valueOf(i));
+    	System.out.println("Button Pressed!");
+    	
     }
 }
