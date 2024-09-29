@@ -5,7 +5,7 @@ public class HPassword { //hashed password
         //TODO this function MUST be modified by Phase 3
         //This should NOT store actual password in memory
         final RngStrGen rsg = new RngStrGen(true, true, true);
-        final String SALT = rsg.seededGenerate(rawPswd.length(), 0);
+        final String SALT = rsg.seededGenerate(rawPswd.length(), 0); //TODO seed?
         return new HPassword(rawPswd);
     }
 
@@ -23,11 +23,8 @@ public class HPassword { //hashed password
         String otp;
 
         final static int OTPL= 8; // one time password length
-        final static RngStrGen RSG = new RngStrGen(true, false, false);
+        final static RngStrGen RSG = new RngStrGen(true, false, false);// numbers only
 
-        // for more divers character sets in otps
-        //static boolean aryGened = false;
-        //static int[] otpc = []; //one time password characters
         public static OTP getOTP() {
             return new OTP(RSG.generate(OTPL));
 

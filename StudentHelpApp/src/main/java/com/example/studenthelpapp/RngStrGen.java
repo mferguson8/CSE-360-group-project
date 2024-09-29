@@ -58,7 +58,10 @@ public class RngStrGen {// random string generation
         return lseed;
     }
 
-    public String seededGenerate(int length, String seed) {
+    private String optionalSeededGenerate(int length, String seed, boolean force) {
+        if (seed == 0 && !force) {
+            return this.generate(length);
+        }
         StringBuilder neo = new StringBuilder("");
         Random rng = new Random(StrToSeed(seed));
 
@@ -70,9 +73,14 @@ public class RngStrGen {// random string generation
     }
 
     public String seededGenerate(int length, long seed) {
-        if (seed == 0) {
+        return this.optionalSeededGenerate(length, seed, false);
+    }
+
+    private String optionalSeededGenerate(int length, long seed, boolean force) {
+        if (seed == 0 && !force) {
             return this.generate(length);
         }
+
         StringBuilder neo = new StringBuilder("");
         Random rng = new Random(seed);
 
@@ -81,5 +89,18 @@ public class RngStrGen {// random string generation
         }
 
         return neo.toString();
+
+    }
+
+    public String forceSeededGenerate(int length, long seed) {
+        return this.optionalSeededGenerate(length, seed, true);
+    }
+
+    public String seededGenerate(int length, String seed) {
+        return this.optionalSeededGenerate(length, seed, false);
+    }
+
+    public String forceSeededGenerate(int length, String seed) {
+        return this.optionalSeededGenerate(length, seed, true);
     }
 }
