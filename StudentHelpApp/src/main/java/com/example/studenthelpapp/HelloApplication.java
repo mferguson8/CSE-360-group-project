@@ -1,4 +1,4 @@
-//package com.example.studenthelpapp;
+package com.example.studenthelpapp;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -29,6 +29,5 @@ public class HelloApplication extends Application {
     	i++;
     	gui.setTitle(String.valueOf(i));
     	System.out.println("Button Pressed!");
-    	
     }
 }
