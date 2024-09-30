@@ -25,6 +25,7 @@ public abstract class User {
     // TO DO:
     // properly integrate with Database.java
     // and update UML
+    //
  
 
     public User(String email, String userName, byte[] passwordHash, boolean isOneTimePassword, LocalDateTime oneTimePasswordExpiration, 
