@@ -91,16 +91,7 @@ public class Name {
         }
 
         private boolean exists(Position p) {
-            switch (p) {
-                case FIRST:
-                    return names.first != null;
-                case MIDDLE:
-                    return names.middle != null;
-                case LAST:
-                    return names.last != null;
-                case PREFERRED:
-                    return names.last != null;
-            }
+           return this.gSName(p) != null;
         }
 
         private String gSName(Position p) {//get specific name
@@ -114,6 +105,18 @@ public class Name {
                 case PREFERRED:
                     return names.last;
             }
+        }
+
+        public static boolean isLower(char c) {
+            return ('a' <= c) && (c <= 'z');
+        }
+
+        public static boolean isUpper(char c) {
+            return ('A' <= c) && (c <= 'Z');
+        }
+
+        public static boolean is Alpha(char c) {
+            return isLower(c) || isUpper(c);
         }
     }
 }
