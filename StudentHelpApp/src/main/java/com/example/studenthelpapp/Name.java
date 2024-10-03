@@ -115,8 +115,26 @@ public class Name {
             return ('A' <= c) && (c <= 'Z');
         }
 
-        public static boolean is Alpha(char c) {
+        public static boolean isAlpha(char c) {
             return isLower(c) || isUpper(c);
+        }
+
+        public static boolean isNumber(char c) {
+            return ('0' <= c) && (c <= '9');
+        }
+
+        public static boolean isSpecial(char c) {
+            return !(isLower(c) || isUpper(c) || isAlpha(c) || isNumber(c));
+        }
+
+        public static boolean isANS(char c) { //is aaccepted name special, isAUNS - ia accepedt username special
+            if (!isSpecial(c)) return false;
+            final char[] ACCEPTED = {' ', '-', '\'', '.'};
+
+            for (int fv = 0; fv < ACCEPTED.length; fv++) {
+                if (ACCEPEDT[fv] == c) return true;
+            }
+            return false;
         }
     }
 }
