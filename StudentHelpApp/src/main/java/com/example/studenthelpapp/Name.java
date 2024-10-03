@@ -47,9 +47,10 @@ public class Name {
         Name names;
 
         public static enum Status {
-            START_NUM, //starts withnumbers
+            START_NUM, //starts with numbers
             HAS_SPEC, //has special
             DNE, //does not exist
+            OOPN, //out of place number
             SUCCESS
         }
 
@@ -135,6 +136,30 @@ public class Name {
                 if (ACCEPEDT[fv] == c) return true;
             }
             return false;
+        }
+
+        public Status checkName(Position p) {
+            String tname = this.gSN(p);
+            if (tname == null) return Status.DNE;
+            if (isNumber(tname.charAt(0))) return Status.HAS_SPEC;
+
+            boolean end_nums = false;
+            char cc = 0;//current char
+            boolean in = false;// is number
+
+            for (int fv = 0; fv < tname.length(); fv++) {
+                cc = tname.charAt(fv);
+                in = isNumber(cc);
+                if (end_nums) {
+                    if(!in) return OOPN;
+                } else {
+                    end_nums = in;
+                    if (isSpecial(cc) && (!isANS(cc))) return HAS_SPEC;
+                }
+
+
+            }
+            return SUCCESS;
         }
     }
 }
