@@ -51,8 +51,21 @@ public class RngStrGen {// random string generation
 
     private static long StrToSeed(String sseed) {
         long lseed = 0;
+        long sub = 0;
+
+        //long casting
+        long curChar = 0; //
+        long lfv = 0; //long fv
+        long fvm1 = 0; //fv mod 1
+        long fvm2 = 0; // fv mod 2
+
         for (int fv = 0; fv < sseed.length(); fv++) {
-            lseed += (sseed.charAt(fv) << (fv % 56)) - fv;
+            lfv = fv;
+            curChar = sseed.charAt(fv);
+            fvm1 = lfv % 8;
+            fvm2 = lfv % 56; //sizeOf(long) - sizneOf(char) = 64 - 8 = 56
+            sub += (curChar & (1 << (fvm1))) != 0;
+            lseed += curChar << fvm2 - sub;
         }
 
         return lseed;
