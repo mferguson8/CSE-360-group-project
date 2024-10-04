@@ -1,5 +1,7 @@
 package com.example.studenthelpapp;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 //TODO
 //Handle Invite Codes, adding new ones, and creating users from access codes
@@ -16,26 +18,43 @@ class DatabaseController {
 		static final String DB_URL = "jdbc:h2:~/firstDatabase";  
 		
 		//The applications login credentials
-		static final String USER = "application_user"; 
-		static final String PASS = "surelyThereIsABetterWayToDoThis"; 
+		static final String USER = "sa"; 
+		static final String PASS = ""; 
 		
 		//Connection and Statement
 		private Connection connection = null;
 		private Statement statement = null; 
 		
 		
-		public void connectToDatabase() throws SQLException {
+		public void connectToDatabase() {
+			
 			try {
 				Class.forName(JDBC_DRIVER); // Load the JDBC driver
 				System.out.println("Connecting to database...");
 				connection = DriverManager.getConnection(DB_URL, USER, PASS);
 				statement = connection.createStatement(); 
+				wipeDatabase(); //TODO: This is for testing. Remove
+				
 				createTables();  // Create the necessary tables if they don't exist
+				System.out.println("Connected to database!");
 			} catch (ClassNotFoundException e) {
 				System.err.println("JDBC Driver not found: " + e.getMessage());
+			} catch (SQLException e) {
+				System.err.println("SQL ERROR CONNECTING: " + e.getMessage());
 			}
 		}
 		
+		
+		public void wipeDatabase() {
+		    String sql = "DROP ALL OBJECTS";
+		    try (Statement stmt = connection.createStatement()) {
+		        stmt.execute(sql);
+		        System.out.println("All objects in the database have been dropped.");
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    }
+		}
+
 		
 		private void createTables() throws SQLException {
 			//Creates these tables if they don't exist
@@ -58,7 +77,7 @@ class DatabaseController {
 					+ "preferred_name VARCHAR(20) NULL,"
 					+ "password_reset_flag BOOLEAN DEFAULT FALSE,"
 					+ "password_reset_timeout TIMESTAMP NULL,"
-					+ "password_salt VARCHAR(20) NOT NULL) ";
+					+ "password_salt VARCHAR(40) NOT NULL) ";
 			
 			//Table holds what users have what roles
 			String roleJunctionTable = "CREATE TABLE IF NOT EXISTS USERROLES ("
@@ -270,8 +289,8 @@ class DatabaseController {
 		
 		public boolean createUser(String username, String hashed_password, String password_salt) {
 			//For initial user creation, you only need to specify the username, hashed_password, and password_salt
-			String insertion = "INSERT INTO USERS (username, hashed_password, password_salt)"
-					+ "VALUES (?, ?, ?)";
+			String insertion = "MERGE INTO USERS (username, hashed_password, password_salt)"
+					+ "KEY (username) VALUES (?, ?, ?)";
 			try (PreparedStatement pstmt = connection.prepareStatement(insertion)) {
 				pstmt.setString(1,username);
 				pstmt.setString(2,hashed_password);
@@ -282,6 +301,84 @@ class DatabaseController {
 				e.printStackTrace();
 			}
 			return false;
+		}
+		
+		public void changeUserRoles(int userID, int[] role) {
+			//For changing user roles		
+			int[] roleIntArr = getRoleIdList();
+			for(int i : roleIntArr) {
+				deleteRoleFromUser(userID, i);
+				for(int j: role) {
+					if(i == j) {
+						addRoleToUser(userID,i);
+					}
+				}
+			}
+		}
+		
+		public boolean addRoleToUser(int userID, int roleID) {
+			String addRole = "INSERT INTO USERROLES (user_id, role_id) VALUES (?, ?)";
+			try (PreparedStatement pstmt = connection.prepareStatement(addRole)) {
+				pstmt.setInt(1,userID);
+				pstmt.setInt(2,roleID);
+				int rowsAdded = pstmt.executeUpdate();
+				return rowsAdded == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
+		public boolean deleteRoleFromUser(int userID, int roleID) {
+			String deleteRole = "DELETE FROM USERROLES where user_id = ? AND role_id = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(deleteRole)) {
+				pstmt.setInt(1,userID);
+				pstmt.setInt(2,roleID);
+				int rowsDeleted = pstmt.executeUpdate();
+				return rowsDeleted == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
+		
+		public int[] getUsersRoleIds(int userID) {
+			List<Integer> roleList = new ArrayList<>();
+			String getRoles = "SELECT role_id FROM USERROLES WHERE user_id = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
+				pstmt.setInt(1,userID);
+				ResultSet rs = pstmt.executeQuery();
+				while(rs.next()) {
+					roleList.add(rs.getInt("role_id"));
+				}
+				int[] roleIntArr = roleList.stream().mapToInt(Integer::intValue).toArray();
+				return roleIntArr;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return new int[0];
+		}
+		
+		public int[] getRoleIdList() {
+			int[] roleIntArr;
+			String getRoles = "SELECT role_id FROM ROLES";
+			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
+				ResultSet rs = pstmt.executeQuery();
+				rs.last();
+				int rolesFound = rs.getRow();
+				rs.beforeFirst();
+				roleIntArr = new int[rolesFound];
+				for(int i = 0; i < rolesFound; i++) {
+					if(rs.next()) {
+						roleIntArr[i] = rs.getInt("role_id");
+					}
+				}
+				return roleIntArr;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return new int[0];
 		}
 		
 		public boolean registerUser(int user_id, String email, String first_name, String middle_name, String last_name, String preferred_name) {

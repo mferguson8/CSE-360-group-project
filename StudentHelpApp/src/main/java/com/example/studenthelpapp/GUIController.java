@@ -16,7 +16,8 @@ import javafx.scene.text.Font;
 //import javafx.scene.text.Text;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 // Notes: Need to fix role page (shouldn't show all roles unless they have them)
 // Notes: switchScene useless?
 // Notes: Didn't use original button handling
@@ -383,12 +384,7 @@ public class GUIController implements EventHandler<ActionEvent>{
             // Check if password exists and matches username (as in, 
             // handleLogin?
             
-            
-            // If finish set up false, finish set up
-          //  switchScene(finishSetUp());
-              switchScene(selectRole());
-            // If true, home/role page
-            handleButtonPress(); //Calls a private function to handle the button press
+            helloApp.HandleLoginAttempt(username, password);
 		}
 
 		// Register Handling (Submitting Invitation Code)
@@ -404,7 +400,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 		// Finish Set Up Handling 
 		else if (event.getSource() == finish) {
-            String username = enterEmail.getText();
+            String email = enterEmail.getText();
             String firstName = enterFirstName.getText();
             String middleName = enterMiddleName.getText();
             String lastName = enterLastName.getText();
@@ -416,17 +412,7 @@ public class GUIController implements EventHandler<ActionEvent>{
             enterLastName.clear();
             enterPreferredName.clear();
             
-            // If more than 1 role
-            
-            	// Go to role page 
-            
-            // If 1 role
-            
-            	// Go to home page
-            
-            // Will change to role page or home page
-            switchScene(login_page());
-            handleButtonPress(); //Calls a private function to handle the button press
+            helloApp.finishUserSetup(email, firstName, middleName, lastName, preferredName);
 		}
 
 
@@ -466,24 +452,17 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 	
-	private void showAlert(String string) {
-		
-		okAlert = new Button();
-		okAlert.setText("OK");
-		
-		Label alert = new Label(string);
-		setupLabelUI(alert, "Arial", 18, windowX, 
-				Pos.CENTER, windowX/8, 30);
-		
-		Pane alertRoot = new Pane();
-		
-		alertRoot.getChildren().addAll(okAlert, alert);
-		
-		Scene alertScene = new Scene(alertRoot, windowX, windowY);
-		mainStage.setScene(alertScene);
-		mainStage.show();
-		
+	public void showAlert(String message) {
+	    // Create an Alert dialog
+	    Alert alert = new Alert(AlertType.INFORMATION);
+	    alert.setTitle("Information");
+	    alert.setHeaderText(null);
+	    alert.setContentText(message);
+
+	    // Make the dialog blocking (modal)
+	    alert.showAndWait();  // This method blocks until the user closes the dialog
 	}
+
 
 	/**************************************
 	 * Note: Stuff below not used much yet, got it from HW#5, will probably use to pretty up GUI soon
