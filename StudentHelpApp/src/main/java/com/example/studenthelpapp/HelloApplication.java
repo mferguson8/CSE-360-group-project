@@ -153,6 +153,7 @@ public class HelloApplication extends Application {
     	int[] roles = database.getUsersRoleIds(userID);
 		if(roles.length == 0) {
 			System.err.println("User ID: " + Integer.toString(userID) +" does not have any roles");
+			return;
 		} else if( roles.length == 1) {
 			if(roles[0] == 1) {
 				gui.switchScene(gui.adminHomePage());
@@ -165,7 +166,7 @@ public class HelloApplication extends Application {
 				System.out.println("Directed to Student Homepage");
 			}
 		} else if(roles.length > 1) {
-			gui.switchScene(gui.selectRole());
+			gui.switchScene(gui.selectRole(roles));
 		}
     }
     
