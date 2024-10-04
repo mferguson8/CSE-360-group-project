@@ -29,7 +29,7 @@ import javafx.scene.control.TextField;
  * GUI
  * 
  */
-public class GUIController extends HelloApplication implements EventHandler<ActionEvent>{
+public class GUIController implements EventHandler<ActionEvent>{
 	
 	/*****************************************
 	 * 
@@ -95,13 +95,7 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
     private Label Alert;
     
 	
-	/**
-	 * Main
-	 * @param args
-	 */
-    public static void main(String[] args) {
-        launch(args);
-    }
+	
     
     /**
      * Initializer 
@@ -111,7 +105,7 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
     public void initialize(Stage mainStage, HelloApplication helloApp) {
     	this.mainStage = mainStage;
 		this.helloApp = helloApp;
-		switchScene(create_account()); // Placeholder 
+		switchScene(login_page()); // Placeholder 
     }
     
     /**
@@ -266,7 +260,7 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
 		resetUser.setText("Reset User");
 		
 		deleteUser = new Button();
-		deleteUser.setText("Deleter User");
+		deleteUser.setText("Delete User");
 		
 		listUsers = new Button();
 		listUsers.setText("List Users");
