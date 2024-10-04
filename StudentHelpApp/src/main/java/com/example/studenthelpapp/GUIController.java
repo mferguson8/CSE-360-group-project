@@ -17,13 +17,18 @@ import javafx.scene.text.Font;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+// Notes: Need to fix role page (shouldn't show all roles unless they have them)
+// Notes: switchScene useless?
+// Notes: Didn't use original button handling
+// Add labels (stuff I can do myself though)
+
 
 /**
  * 
  * GUI
  * 
  */
-public class GUI extends HelloApplication implements EventHandler<ActionEvent>{
+public class GUIController extends HelloApplication implements EventHandler<ActionEvent>{
 	
 	/*****************************************
 	 * 
@@ -331,7 +336,7 @@ public class GUI extends HelloApplication implements EventHandler<ActionEvent>{
 	
 	/**
 	 * Handle button press
-	 * ?????
+	 * Not used?
 	 * 
 	 */
 	private void handleButtonPress() { //Triggered when someone presses the button
@@ -345,6 +350,7 @@ public class GUI extends HelloApplication implements EventHandler<ActionEvent>{
 	 */
 	public void handle(ActionEvent event) {
 		
+		// Create Account Handling 
 		if(event.getSource() == createAccount) {
 			String username = createUsername.getText();
 			String password1 = createPassword.getText();
@@ -368,9 +374,11 @@ public class GUI extends HelloApplication implements EventHandler<ActionEvent>{
 			createPassword.clear();
 			confirmPassword.clear();
         
-			//switchScene(login_page());
+			//switchScene(login_page());  // Messed up switchScene, so I'm just calling two function which seems inefficient 
 			handleButtonPress(); //Calls a private function to handle the button press
 		}
+
+		// Login Handling 
 		else if (event.getSource() == login) {
 			String username = enterUsername.getText();
             String password = enterPassword.getText();
@@ -387,6 +395,8 @@ public class GUI extends HelloApplication implements EventHandler<ActionEvent>{
             // If true, home/role page
             handleButtonPress(); //Calls a private function to handle the button press
 		}
+
+		// Register Handling (Submitting Invitation Code)
 		else if (event.getSource() == register) {
             String code = enterCode.getText();
 
@@ -396,6 +406,8 @@ public class GUI extends HelloApplication implements EventHandler<ActionEvent>{
             switchScene(create_account());
             handleButtonPress(); //Calls a private function to handle the button press
 		}
+
+		// Finish Set Up Handling 
 		else if (event.getSource() == finish) {
             String username = enterEmail.getText();
             String firstName = enterFirstName.getText();
@@ -421,27 +433,36 @@ public class GUI extends HelloApplication implements EventHandler<ActionEvent>{
             switchScene(login_page());
             handleButtonPress(); //Calls a private function to handle the button press
 		}
+
+
 		else if (event.getSource() == admin) {
 			switchScene(adminHomePage());
 		}
+
+
 		else if (event.getSource() == invite) {
 			// invite user
 		}
+
 		else if (event.getSource() == resetUser) {
 			// .getText
 			// reset 
 		}
+
 		else if (event.getSource() == deleteUser) {
 			//.getText
 			// delete
 		}
+
 		else if (event.getSource() == listUsers) {
 			// list 
 		}
+
 		else if (event.getSource() == addRoleToUser) {
 			// .getText
 			// add
 		}
+
 		else if (event.getSource() == removeRoleFromUser) {
 			// .getText
 			// remove
