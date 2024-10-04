@@ -21,6 +21,7 @@ import javafx.scene.control.TextField;
 // Notes: switchScene useless?
 // Notes: Didn't use original button handling
 // Add labels (stuff I can do myself though)
+// Better naming conventions?
 
 
 /**
@@ -74,7 +75,7 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
     private Button student;
     
     // UI components for admin home page
-    private Button adminLogout; // 
+    private Button adminLogout; 
     private Button invite;
     private Button resetUser;
     private Button deleteUser;
