@@ -29,7 +29,7 @@ import javafx.scene.control.TextField;
  * GUI
  * 
  */
-public class GUIController extends HelloApplication implements EventHandler<ActionEvent>{
+public class GUIController implements EventHandler<ActionEvent>{
 	
 	/*****************************************
 	 * 
@@ -75,14 +75,14 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
     private Button student;
     
     // UI components for admin home page
+    private TextField user; // The username associated with the account to edit
     private Button adminLogout; 
     private Button invite;
     private Button resetUser;
     private Button deleteUser;
     private Button listUsers;
     private Button addRoleToUser;
-    private Button removeRoleFromUser;
-    
+    private Button removeRoleFromUser;   
     
     // UI components for instructor home page
     private Button instructorLogout; // If all logouts do same thing, can probably just use one logout button
@@ -90,18 +90,19 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
     // UI components for student home page 
     private Button studentLogout;
     
+    // UI components for inviteUser
+    private String giveInvCode;   	// Give invite code 
+    private Button confirmRoles;	// Confirm roles given
+    private CheckBox selAdmin;   	// Select admin
+    private CheckBox selInstructor; // Select Instructor
+    private CheckBox selStudent;  	// Select Student
+    private Alert codeAlert;
+	
     // Show Alert
     private Button okAlert;
-    private Label Alert;
+    private Label alert;
     
 	
-	/**
-	 * Main
-	 * @param args
-	 */
-    public static void main(String[] args) {
-        launch(args);
-    }
     
     /**
      * Initializer 
@@ -111,7 +112,7 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
     public void initialize(Stage mainStage, HelloApplication helloApp) {
     	this.mainStage = mainStage;
 		this.helloApp = helloApp;
-		switchScene(create_account()); // Placeholder 
+		switchScene(login_page()); // Placeholder 
     }
     
     /**
@@ -228,6 +229,7 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
 	/**
 	 * Role scene
 	 * Incomplete, or need more scenes so that only the one's that apply show up
+	 * Modify so that buttons only appear to people who have the roles 
 	 */
 	public Scene selectRole() { 
 		
@@ -261,21 +263,33 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
 		
 		invite = new Button();
 		invite.setText("Invite User");
+		// Bring to scene to specify roles
+		// Give invitation code for those roles
+
+		// Possible expiration date
 		
-		resetUser = new Button();
-		resetUser.setText("Reset User");
+		resetUserPassword = new Button();
+		resetUserPassword.setText("Reset User Password");
+		// Gives one time password and expiration date/time
+		
+		// User side: check date/time and code
+		// Reset flag after code use
+		// Set up password scene for user
+		// Direct back to login after password set 
 		
 		deleteUser = new Button();
-		deleteUser.setText("Deleter User");
+		deleteUser.setText("Delete User");
+		// Are you sure alert?
+		// Yes/no
 		
 		listUsers = new Button();
 		listUsers.setText("List Users");
 		
 		addRoleToUser = new Button();
-		addRoleToUser.setText("Add Role");
+		addRoleToUser.setText("Add Role to User");
 		
 		removeRoleFromUser = new Button();
-		removeRoleFromUser.setText("Remove Role");
+		removeRoleFromUser.setText("Remove Role from User");
 		
 		
 		
@@ -285,6 +299,30 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
 
 		Scene adminHomeScene = new Scene(adminHomeRoot, windowX, windowY);
 		return adminHomeScene;
+	}
+
+		public Scene inviteUser() {
+		
+		selAdmin = new CheckBox();
+		selAdmin.setText("Admin");
+		
+		selInstructor = new CheckBox();
+		selInstructor.setText("Instructor");
+		
+		selStudent = new CheckBox();
+		selStudent.setText("Student");
+		
+		confirmRoles = new Button();
+		confirmRoles.setText("Confirm");
+		
+		
+		
+		VBox inviteUserRoot = new VBox(20);
+		
+		inviteUserRoot.getChildren().addAll(selAdmin, selInstructor, selStudent, confirmRoles);
+		
+		Scene inviteUserScene = new Scene(inviteUserRoot, windowX, windowY);
+		return inviteUserScene;
 	}
 	
 	
@@ -375,7 +413,7 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
 			createPassword.clear();
 			confirmPassword.clear();
         
-			//switchScene(login_page());  // Messed up switchScene, so I'm just calling two function which seems inefficient 
+			switchScene(login_page());
 			handleButtonPress(); //Calls a private function to handle the button press
 		}
 
@@ -439,10 +477,41 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
 		else if (event.getSource() == admin) {
 			switchScene(adminHomePage());
 		}
-
-
+		
 		else if (event.getSource() == invite) {
-			// invite user
+			switchScene(inviteUser());
+		}
+		
+		else if (event.getSource() == confirmRoles) {
+			boolean adminSelected = selAdmin.isSelected();
+			boolean instructorSelected = selInstructor.isSelected();
+			boolean studentSelected = selStudent.isSelected();
+			codeAlert = new Alert(AlertType.INFORMATION);
+			/*
+			if (adminSelected) {
+				// Add admin role
+			}
+			if (instructorSelected) {
+				// Add instructor role
+			}
+			if (studentSelected) {
+				// Add student role
+			}
+			else {
+				// Error, no roles selected
+				// Perhaps if none selected, automatically make student
+				codeAlert.setTitle("Error");
+				codeAlert.setContentText("Select at least one role!");
+			}
+			// If no error
+			*/
+			
+			// Just testing to get alert to work 
+			codeAlert.setTitle("Invitation Code!");
+			codeAlert.setContentText("Code");
+			
+			codeAlert.showAndWait();
+
 		}
 
 		else if (event.getSource() == resetUser) {
@@ -553,4 +622,3 @@ public class GUIController extends HelloApplication implements EventHandler<Acti
 	
 	
 }
-
