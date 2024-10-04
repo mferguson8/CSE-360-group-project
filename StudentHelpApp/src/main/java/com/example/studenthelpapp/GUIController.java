@@ -1,4 +1,4 @@
-package StudentHelpApp;
+package com.example.studenthelpapp;
 
 // Some of these unnecessary so far 
 //import javafx.application.Application;
