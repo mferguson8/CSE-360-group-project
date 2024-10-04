@@ -75,7 +75,7 @@ public class GUIController implements EventHandler<ActionEvent>{
     private Button student;
     
     // UI components for admin home page
-    private TextField user; // The username associated with the account to edit
+    private TextField enterUser; // The username associated with the account to edit
     private Button adminLogout; 
     private Button invite;
     private Button resetUser;
@@ -97,7 +97,7 @@ public class GUIController implements EventHandler<ActionEvent>{
     private CheckBox selInstructor; // Select Instructor
     private CheckBox selStudent;  	// Select Student
     private Alert codeAlert;
-	
+
     // Show Alert
     private Button okAlert;
     private Label alert;
@@ -324,6 +324,55 @@ public class GUIController implements EventHandler<ActionEvent>{
 		Scene inviteUserScene = new Scene(inviteUserRoot, windowX, windowY);
 		return inviteUserScene;
 	}
+
+		
+	/**
+	 * For admin to reset password
+	 * @return
+	 */
+	public Scene resetUserPass() { 
+		
+		enterUser = new TextField();
+		enterUser.setPromptText("Enter user to password reset: ");
+		
+		resetPass = new Button();
+		resetPass.setText("Reset");
+		
+		
+		
+		VBox inviteUserRoot = new VBox(20);
+		
+		inviteUserRoot.getChildren().addAll(enterUser, resetPass);
+		
+		Scene inviteUserScene = new Scene(inviteUserRoot, windowX, windowY);
+		return inviteUserScene;
+		
+	}
+	
+	/**
+	 * For user to reset password after given code 
+	 * @return
+	 */
+	public Scene changePass() {
+		
+		newPass = new TextField();
+		newPass.setPromptText("Enter your new password: ");
+		
+		confirmNewPass = new TextField(); 
+		confirmNewPass.setPromptText("Confirm your password: ");
+		
+		setPass = new Button();
+		setPass.setText("Change Password");
+		
+		
+		VBox changePassRoot = new VBox(20);
+		
+		changePassRoot.getChildren().addAll(newPass, confirmNewPass, setPass);
+		
+		Scene changePassScene = new Scene(changePassRoot, windowX, windowY);
+		return changePassScene;
+	}
+	
 	
 	
 	public Scene instructorHomePage() {
@@ -514,9 +563,13 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 		}
 
-		else if (event.getSource() == resetUser) {
-			// .getText
-			// reset 
+		else if (event.getSource() == resetUserPassword) {
+			String user = enterUser.getText();
+			// Check user exists
+			
+			// Set a one-time password and expiration date/time 
+			
+			// reset password to code 
 		}
 
 		else if (event.getSource() == deleteUser) {
