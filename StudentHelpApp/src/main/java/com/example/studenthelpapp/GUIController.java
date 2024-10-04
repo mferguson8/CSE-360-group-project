@@ -1,5 +1,8 @@
 package com.example.studenthelpapp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // Some of these unnecessary so far 
 //import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -224,21 +227,29 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * Role scene
 	 * Incomplete, or need more scenes so that only the one's that apply show up
 	 */
-	public Scene selectRole() { 
+	public Scene selectRole(int[] roles) { 
+		List<Button> roleButtons = new ArrayList<>();
 		
-		admin = new Button();
-		admin.setText("Admin");
-		
-		instructor = new Button();
-		instructor.setText("Instructor");
-		
-		student = new Button();
-		student.setText("Student");
-		
+		for(int i: roles) {
+			if(i == 1) {
+				admin = new Button("Admin");
+				admin.setOnAction(this);
+				roleButtons.add(admin);
+			} else if (i == 2) {
+				instructor = new Button("Instructor");
+				instructor.setOnAction(this);
+				roleButtons.add(instructor);
+			} else if (i == 3) {
+				student = new Button("Student");
+				student.setOnAction(this);
+				roleButtons.add(student);
+			}
+			
+		}
 		
 		VBox selectRoleRoot = new VBox(20);
 		
-		selectRoleRoot.getChildren().addAll(admin, instructor, student);
+		selectRoleRoot.getChildren().addAll(roleButtons);
 
 		Scene selectRoleScene = new Scene(selectRoleRoot, windowX, windowY);
 		return selectRoleScene;
@@ -417,6 +428,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 
 		else if (event.getSource() == admin) {
+			System.out.print("Admin Button Pressed");
 			switchScene(adminHomePage());
 		}
 
