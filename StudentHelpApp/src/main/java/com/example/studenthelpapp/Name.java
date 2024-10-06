@@ -108,28 +108,10 @@ public class Name {
             }
         }
 
-        public static boolean isLower(char c) {
-            return ('a' <= c) && (c <= 'z');
-        }
 
-        public static boolean isUpper(char c) {
-            return ('A' <= c) && (c <= 'Z');
-        }
-
-        public static boolean isAlpha(char c) {
-            return isLower(c) || isUpper(c);
-        }
-
-        public static boolean isNumber(char c) {
-            return ('0' <= c) && (c <= '9');
-        }
-
-        public static boolean isSpecial(char c) {
-            return !(isLower(c) || isUpper(c) || isAlpha(c) || isNumber(c));
-        }
 
         public static boolean isANS(char c) { //is aaccepted name special, isAUNS - ia accepedt username special
-            if (!isSpecial(c)) return false;
+            if (!StrChecker.isSpecial(c)) return false;
             final char[] ACCEPTED = {' ', '-', '\'', '.'};
 
             for (int fv = 0; fv < ACCEPTED.length; fv++) {
@@ -141,7 +123,7 @@ public class Name {
         public Status checkName(Position p) {
             String tname = this.gSN(p);
             if (tname == null) return Status.DNE;
-            if (isNumber(tname.charAt(0))) return Status.HAS_SPEC;
+            if (StrChecker.isNumber(tname.charAt(0))) return Status.HAS_SPEC;
 
             boolean end_nums = false;
             char cc = 0;//current char
@@ -149,12 +131,12 @@ public class Name {
 
             for (int fv = 0; fv < tname.length(); fv++) {
                 cc = tname.charAt(fv);
-                in = isNumber(cc);
+                in = StrChecker.isNumber(cc);
                 if (end_nums) {
                     if(!in) return OOPN;
                 } else {
                     end_nums = in;
-                    if (isSpecial(cc) && (!isANS(cc))) return HAS_SPEC;
+                    if (StrChecker.isSpecial(cc) && (!StrChecker.isANS(cc))) return HAS_SPEC;
                 }
 
 
