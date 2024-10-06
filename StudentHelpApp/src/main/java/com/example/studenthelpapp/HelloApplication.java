@@ -21,6 +21,7 @@ public class HelloApplication extends Application {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public void start(Stage primaryStage) {
 <<<<<<< HEAD
         //String test_txt = "test@test.com";
@@ -49,6 +50,10 @@ public class HelloApplication extends Application {
         primaryStage.setScene(new Scene(root, 300, 250));
         primaryStage.show();
 =======
+=======
+
+    public void start(@SuppressWarnings("exports") Stage primaryStage) {
+>>>>>>> 50db6e5 (handleLogin file)
     	System.out.println("ASU Hello World!");
     	System.out.println("It started!");
         gui = new GUIController();
