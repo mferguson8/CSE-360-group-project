@@ -4,6 +4,7 @@ module com.example.studenthelpapp {
 <<<<<<< HEAD
 <<<<<<< HEAD
     requires java.sql;
+<<<<<<< HEAD
 
 =======
     
@@ -11,6 +12,8 @@ module com.example.studenthelpapp {
 =======
 
 >>>>>>> 18cf93c (my changes)
+=======
+>>>>>>> f1d25a6 (Added hashString function, which required 2 new imports)
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
 
