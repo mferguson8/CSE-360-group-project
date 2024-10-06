@@ -11,11 +11,14 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+	private int i = 0;
+	private GUIController gui;
     public static void main(String[] args) {
         launch(args);
     }
 
     public void start(Stage primaryStage) {
+<<<<<<< HEAD
         //String test_txt = "test@test.com";
         //System.out.println("test_txt: " + test_txt);
         //Email.EmailResult er = Email.make_email(test_txt);
@@ -36,5 +39,19 @@ public class HelloApplication extends Application {
         root.getChildren().add(btn);
         primaryStage.setScene(new Scene(root, 300, 250));
         primaryStage.show();
+=======
+    	System.out.println("ASU Hello World!");
+    	System.out.println("It started!");
+        gui = new GUIController();
+        gui.initialize(primaryStage, this);
+        
+    }
+    
+    public void onButtonPressed() { //Called by GUIController when someone presses the button
+    	i++;
+    	gui.setTitle(String.valueOf(i));
+    	System.out.println("Button Pressed!");
+    	
+>>>>>>> ec8ca11 (GUI Initial and GUIController and Application Interaction)
     }
 }
