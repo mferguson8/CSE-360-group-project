@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO
-//Handle Invite Codes, adding new ones, and creating users from access codes
-//Handle Registering New Users
+
 //Handle Adding/changing data about current users
 //Handle admin listing users (user_name, first middle and last name, roles)
 
 //Note: Use SecureRandom to generate salts, and try to make them at least 20 characters
 //In addition, switch from SHA256 to bcrypt, scrypt, or Argon2 for better security.
+
+//Don't store database login and password in code, and change them.
 
 class DatabaseController {
 		// JDBC driver name and database URL 
@@ -433,6 +434,69 @@ class DatabaseController {
 		    
 			return false;
 		}
+		
+		public boolean checkIfInviteCodeValid(String invite_code) {
+			String getRows = "SELECT count(*) FROM ACCESSCODEROLES WHERE access_code = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(getRows)) {
+				pstmt.setString(1,invite_code);
+				ResultSet rs = pstmt.executeQuery();
+				if(rs.next()) {
+					int count = rs.getInt(1);
+					return count > 0;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
+		public boolean addInviteCodeRole(String invite_code, int role_id) {
+			String addRole = "INSERT INTO ACCESSCODEROLES (access_code, role_id) VALUES (?, ?)";
+			try (PreparedStatement pstmt = connection.prepareStatement(addRole)) {
+				pstmt.setString(1,invite_code);
+				pstmt.setInt(2,role_id);
+				int rowsAdded = pstmt.executeUpdate();
+				return rowsAdded == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
+		public int[] getInviteCodeRoles(String invite_code) {
+			String getRoles = "SELECT role_id FROM ACCESSCODEROLES where access_code = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
+				pstmt.setString(1,invite_code);
+				ResultSet rs = pstmt.executeQuery();
+				rs.last();
+				int rolesFound = rs.getRow();
+				rs.beforeFirst();
+				int[] roleIntArr = new int[rolesFound];
+				for(int i = 0; i < rolesFound; i++) {
+					if(rs.next()) {
+						roleIntArr[i] = rs.getInt("role_id");
+					}
+				}
+				return roleIntArr;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return new int[0];
+		}
+		
+		public boolean deleteInviteCodeRole(String invite_code, int role_id) {
+			String deleteRole = "DELETE FROM ACCESSCODEROLES where access_code = ? AND role_id = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(deleteRole)) {
+				pstmt.setString(1,invite_code);
+				pstmt.setInt(2,role_id);
+				int rowsDeleted = pstmt.executeUpdate();
+				return rowsDeleted == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
 		
 		public void closeConnection() {
 			//Closes the statement and connection to the database

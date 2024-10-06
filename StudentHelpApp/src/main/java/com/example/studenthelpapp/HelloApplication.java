@@ -56,7 +56,7 @@ public class HelloApplication extends Application {
         }
     }
     
-    public void HandleLoginAttempt(String username, String password) {
+    public void handleLoginAttempt(String username, String password) {
     	//First check if any users exist
     	if(database.isDatabaseEmpty())
     	{
@@ -138,5 +138,43 @@ public class HelloApplication extends Application {
     	if(finished) {
     		directToHomePageOrSelectRole(loggedInUserID);
     	}
+    }
+    
+    public void createUser(String invite_code, String username, String password) {
+    	//For creating a user when they join using an invite code.
+    	//Designed to be called by the create account button handling.
+    	
+    	//Generate Password Salt
+    	String password_salt = ""; //TODO: Implement salt generation
+    	String hashed_password = hashString(password + password_salt);
+    	database.createUser(username, hashed_password, password_salt); //Boolean to test if it works?
+    	int user_id = database.getUserIdByUsername(username); //A little clunky
+    	int[] roles = database.getInviteCodeRoles(invite_code);
+    	for(int i: roles) {
+    		database.addRoleToUser(user_id, i); //Check for success or failure?
+    		database.deleteInviteCodeRole(invite_code, i);
+    	}
+    	//Now its time to log them out
+    	gui.showAlert("Thank you for joining. Please login again using the same information");
+		gui.switchScene(gui.login_page());
+    }
+    
+    public void handleInviteCodeAttempt(String invite_code) {
+    	if(database.checkIfInviteCodeValid(invite_code)) {
+    		gui.switchScene(gui.create_account(invite_code));
+    	} else {
+    		gui.showAlert("That is not a valid invite code");
+    	}
+    }
+    
+    
+    
+    public String createInviteCode(int[] roles) {
+    	String inviteCode = "1"; //TODO: Generate Invite Code
+    	for(int i: roles) {
+    		database.addInviteCodeRole(inviteCode, i);
+    		//TODO: Check here for problems?
+    	}
+    	return inviteCode;
     }
 }

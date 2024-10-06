@@ -98,7 +98,7 @@ public class GUIController implements EventHandler<ActionEvent>{
     private Button okAlert;
     private Label Alert;
     
-	
+	private String inviteCode; //Only used to store the invite code for a few functions. Be careful how you use this.
 	
     
     /**
@@ -115,8 +115,10 @@ public class GUIController implements EventHandler<ActionEvent>{
     /**
      * Create account 
      */
-    public Scene create_account() {		
-		
+    public Scene create_account(String invite_code) {		
+			
+    		this.inviteCode = invite_code;
+    	
 			createUsername = new TextField(); 
 			createUsername.setPromptText("Create a username: ");
 			
@@ -269,7 +271,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 		invite.setText("Invite User");
 		
 		resetUser = new Button();
-		resetUser.setText("Reset User");
+		resetUser.setText("Reset User Password");
 		
 		deleteUser = new Button();
 		deleteUser.setText("Delete User");
@@ -278,10 +280,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 		listUsers.setText("List Users");
 		
 		addRoleToUser = new Button();
-		addRoleToUser.setText("Add Role");
+		addRoleToUser.setText("Add Role to User");
 		
 		removeRoleFromUser = new Button();
-		removeRoleFromUser.setText("Remove Role");
+		removeRoleFromUser.setText("Remove Role from User");
 		
 		
 		
@@ -297,7 +299,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	public Scene instructorHomePage() {
 		
 		instructorLogout = new Button();
-		instructorLogout.setText("Instructor");
+		instructorLogout.setText("Logout");
 		
 		VBox instructorHomeRoot = new VBox(20);
 		
@@ -311,7 +313,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	public Scene studentHomePage() {
 		
 		studentLogout = new Button();
-		studentLogout.setText("Student");
+		studentLogout.setText("Logout");
 		
 		VBox studentHomeRoot = new VBox(20);
 		
@@ -371,18 +373,15 @@ public class GUIController implements EventHandler<ActionEvent>{
 			
 			// check passwords match
 			if(password1.equals(password2)) {
-				// 
+				createUsername.clear();
+				createPassword.clear();
+				confirmPassword.clear();
+				helloApp.createUser(this.inviteCode, username, password1);
+				this.inviteCode = null;
 			}
 			else {
 				showAlert("Passwords do not match");
 			}
-
-			createUsername.clear();
-			createPassword.clear();
-			confirmPassword.clear();
-        
-			//switchScene(login_page());  // Messed up switchScene, so I'm just calling two function which seems inefficient 
-			handleButtonPress(); //Calls a private function to handle the button press
 		}
 
 		// Login Handling 
@@ -395,18 +394,17 @@ public class GUIController implements EventHandler<ActionEvent>{
             // Check if password exists and matches username (as in, 
             // handleLogin?
             
-            helloApp.HandleLoginAttempt(username, password);
+            helloApp.handleLoginAttempt(username, password);
 		}
 
 		// Register Handling (Submitting Invitation Code)
 		else if (event.getSource() == register) {
             String code = enterCode.getText();
-
+            
             enterCode.clear();
             // Check that code is exists
             
-            switchScene(create_account());
-            handleButtonPress(); //Calls a private function to handle the button press
+            helloApp.handleInviteCodeAttempt(code);
 		}
 
 		// Finish Set Up Handling 
