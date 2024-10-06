@@ -1,5 +1,8 @@
 package com.example.studenthelpapp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // Some of these unnecessary so far 
 //import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -16,9 +19,11 @@ import javafx.scene.text.Font;
 //import javafx.scene.text.Text;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
 
 // Notes: Need to fix role page (shouldn't show all roles unless they have them)
-// Notes: switchScene useless?
 // Notes: Didn't use original button handling
 // Add labels (stuff I can do myself though)
 // Better naming conventions?
@@ -75,14 +80,14 @@ public class GUIController implements EventHandler<ActionEvent>{
     private Button student;
     
     // UI components for admin home page
-    private TextField enterUser; // The username associated with the account to edit
     private Button adminLogout; 
     private Button invite;
     private Button resetUser;
     private Button deleteUser;
     private Button listUsers;
     private Button addRoleToUser;
-    private Button removeRoleFromUser;   
+    private Button removeRoleFromUser;
+    
     
     // UI components for instructor home page
     private Button instructorLogout; // If all logouts do same thing, can probably just use one logout button
@@ -90,18 +95,11 @@ public class GUIController implements EventHandler<ActionEvent>{
     // UI components for student home page 
     private Button studentLogout;
     
-    // UI components for inviteUser
-    private String giveInvCode;   	// Give invite code 
-    private Button confirmRoles;	// Confirm roles given
-    private CheckBox selAdmin;   	// Select admin
-    private CheckBox selInstructor; // Select Instructor
-    private CheckBox selStudent;  	// Select Student
-    private Alert codeAlert;
-
     // Show Alert
     private Button okAlert;
-    private Label alert;
+    private Label Alert;
     
+	
 	
     
     /**
@@ -119,29 +117,44 @@ public class GUIController implements EventHandler<ActionEvent>{
      * Create account 
      */
     public Scene create_account() {		
-		
-			createUsername = new TextField(); 
-			createUsername.setPromptText("Create a username: ");
-			
-			createPassword = new TextField(); 
-			createPassword.setPromptText("Create a password: ");
-			
-			confirmPassword = new TextField();
-			confirmPassword.setPromptText("Confirm your password: ");
-			
-			
-			createAccount = new Button();
-			createAccount.setText("Create Account"); 
-	        
-			createAccount.setOnAction(this); 
-	            
 
-	        VBox root = new VBox(20);
-			
-			root.getChildren().addAll(createUsername, createPassword, confirmPassword, createAccount);
-			
-			Scene createAccountScene = new Scene(root, windowX, windowY);
-			return createAccountScene;
+		// Currently, it is a VBox, so some of the positioning stuff on the labels don't matter, but I am leaving it
+		// as I may change it anyway (plus it still has the font and all that)
+
+		Label labelCreateUsername = new Label("Create a username here: ");
+		setupLabelUI(labelCreateUsername, "Arial", 12, windowX, 
+				Pos.BASELINE_LEFT, windowX/2, 30);
+	
+		createUsername = new TextField(); 
+		createUsername.setPromptText("Create a username: ");
+
+		Label labelCreatePassword = new Label("Create a password here: ");
+		setupLabelUI(labelCreatePassword, "Arial", 12, windowX, 
+				Pos.BASELINE_LEFT, windowX/2, 30);
+		
+		createPassword = new TextField(); 
+		createPassword.setPromptText("Create a password: ");
+
+		Label labelConfirm = new Label("Confirm the password here: (It must match above!)");
+		setupLabelUI(labelConfirm, "Arial", 12, windowX, 
+				Pos.BASELINE_LEFT, windowX/2, 30);
+		
+		confirmPassword = new TextField();
+		confirmPassword.setPromptText("Confirm your password: ");
+		
+
+		createAccount = new Button();
+		createAccount.setText("Create Account");  
+        
+		createAccount.setOnAction(this); 
+            
+
+        VBox root = new VBox(20);
+		
+		root.getChildren().addAll(labelCreateUsername, createUsername, labelCreatePassword, createPassword, labelConfirm, confirmPassword, createAccount);
+		
+		Scene createAccountScene = new Scene(root, windowX, windowY);
+		return createAccountScene;
     }
 
     /**
@@ -153,15 +166,23 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 		mainStage.setTitle("Login or Register");
 		
-			Label label_Username = new Label("Enter the username here: ");
-			setupLabelUI(label_Username, "Arial", 24, windowX, 
-					Pos.CENTER, windowX/2, 30);
+			Label labelEnterUsername = new Label("Enter the username here: ");
+			setupLabelUI(labelEnterUsername, "Arial", 12, windowX, 
+					Pos.BASELINE_LEFT, (windowX/8) + 20 , 30);
 		
 			enterUsername = new TextField(); 
 			setupTextUI(enterUsername, "Arial", 12, 150, Pos.BASELINE_LEFT, (windowX/8 + 20), 50, "Username: ");
 			
+			Label labelEnterPassword = new Label("Enter the password here: ");
+			setupLabelUI(labelEnterPassword, "Arial", 12, windowX, 
+					Pos.BASELINE_LEFT, (windowX/2) + 20, 30);
+			
 			enterPassword = new TextField(); 
 			setupTextUI(enterPassword, "Arial", 12, 150, Pos.BASELINE_LEFT, (windowX/2) + 20, 50, "Password: ");
+			
+			Label labelEnterCode = new Label("Enter the invite code here: ");
+			setupLabelUI(labelEnterCode, "Arial", 12, windowX, 
+					Pos.BASELINE_LEFT, (windowX/4) + 20, (windowY/2) - 30);
 
 			enterCode = new TextField(); 
 			setupTextUI(enterCode, "Arial", 12, 200, Pos.BASELINE_LEFT, (windowX/4) + 20, windowY/2, "Invitation code: ");
@@ -180,11 +201,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 			
 	        Pane root = new Pane();
 
-	        root.getChildren().addAll(login, register, enterUsername, enterPassword, enterCode);
+	        root.getChildren().addAll(login, register, labelEnterUsername, enterUsername, labelEnterPassword, 
+	        		enterPassword, labelEnterCode, enterCode);
 			
 			Scene loginScene = new Scene(root, windowX, windowY);
 			return loginScene;
-
 	}
 	
 	
@@ -192,7 +213,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * Finish set up Scene
 	 */
 	public Scene finishSetUp() {
-		// Buttons and Textboxes
 		
 		enterEmail = new TextField(); 
 		enterEmail.setPromptText("Enter email: ");
@@ -229,23 +249,30 @@ public class GUIController implements EventHandler<ActionEvent>{
 	/**
 	 * Role scene
 	 * Incomplete, or need more scenes so that only the one's that apply show up
-	 * Modify so that buttons only appear to people who have the roles 
 	 */
-	public Scene selectRole() { 
+	public Scene selectRole(int[] roles) { 
+		List<Button> roleButtons = new ArrayList<>();
 		
-		admin = new Button();
-		admin.setText("Admin");
-		
-		instructor = new Button();
-		instructor.setText("Instructor");
-		
-		student = new Button();
-		student.setText("Student");
-		
+		for(int i: roles) {
+			if(i == 1) {
+				admin = new Button("Admin");
+				admin.setOnAction(this);
+				roleButtons.add(admin);
+			} else if (i == 2) {
+				instructor = new Button("Instructor");
+				instructor.setOnAction(this);
+				roleButtons.add(instructor);
+			} else if (i == 3) {
+				student = new Button("Student");
+				student.setOnAction(this);
+				roleButtons.add(student);
+			}
+			
+		}
 		
 		VBox selectRoleRoot = new VBox(20);
 		
-		selectRoleRoot.getChildren().addAll(admin, instructor, student);
+		selectRoleRoot.getChildren().addAll(roleButtons);
 
 		Scene selectRoleScene = new Scene(selectRoleRoot, windowX, windowY);
 		return selectRoleScene;
@@ -256,52 +283,40 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * 
 	 * @return
 	 */
-	public Scene adminHomePage() { // ADD Textboxes where necessary
+	public Scene adminHomePage() { 
 		
 		adminLogout = new Button();
 		adminLogout.setText("Logout");
 		
 		invite = new Button();
 		invite.setText("Invite User");
-		// Bring to scene to specify roles
-		// Give invitation code for those roles
-
-		// Possible expiration date
 		
-		resetUserPassword = new Button();
-		resetUserPassword.setText("Reset User Password");
-		// Gives one time password and expiration date/time
-		
-		// User side: check date/time and code
-		// Reset flag after code use
-		// Set up password scene for user
-		// Direct back to login after password set 
+		resetUser = new Button();
+		resetUser.setText("Reset User");
 		
 		deleteUser = new Button();
 		deleteUser.setText("Delete User");
-		// Are you sure alert?
-		// Yes/no
 		
 		listUsers = new Button();
 		listUsers.setText("List Users");
 		
 		addRoleToUser = new Button();
-		addRoleToUser.setText("Add Role to User");
+		addRoleToUser.setText("Add Role");
 		
 		removeRoleFromUser = new Button();
-		removeRoleFromUser.setText("Remove Role from User");
+		removeRoleFromUser.setText("Remove Role");
 		
 		
 		
 		VBox adminHomeRoot = new VBox(20);
 		
-		adminHomeRoot.getChildren().addAll(adminLogout);
+		adminHomeRoot.getChildren().addAll(adminLogout, invite, resetUser, deleteUser, listUsers, addRoleToUser, removeRoleFromUser);
 
 		Scene adminHomeScene = new Scene(adminHomeRoot, windowX, windowY);
 		return adminHomeScene;
 	}
 
-		public Scene inviteUser() {
+	public Scene inviteUser() {
 		
 		selAdmin = new CheckBox();
 		selAdmin.setText("Admin");
@@ -315,8 +330,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 		confirmRoles = new Button();
 		confirmRoles.setText("Confirm");
 		
-		
-		
 		VBox inviteUserRoot = new VBox(20);
 		
 		inviteUserRoot.getChildren().addAll(selAdmin, selInstructor, selStudent, confirmRoles);
@@ -324,8 +337,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 		Scene inviteUserScene = new Scene(inviteUserRoot, windowX, windowY);
 		return inviteUserScene;
 	}
-
-		
+	
 	/**
 	 * For admin to reset password
 	 * @return
@@ -337,8 +349,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 		resetPass = new Button();
 		resetPass.setText("Reset");
-		
-		
 		
 		VBox inviteUserRoot = new VBox(20);
 		
@@ -372,7 +382,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 		Scene changePassScene = new Scene(changePassRoot, windowX, windowY);
 		return changePassScene;
 	}
-	
 	
 	
 	public Scene instructorHomePage() {
@@ -412,6 +421,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 	    mainStage.setScene(newScene);
 	    mainStage.show();
 	}
+	
+
 	
 	/**
 	 * Set title
@@ -462,7 +473,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 			createPassword.clear();
 			confirmPassword.clear();
         
-			switchScene(login_page());
+			//switchScene(login_page());  // Messed up switchScene, so I'm just calling two function which seems inefficient 
 			handleButtonPress(); //Calls a private function to handle the button press
 		}
 
@@ -472,16 +483,7 @@ public class GUIController implements EventHandler<ActionEvent>{
             String password = enterPassword.getText();
             enterUsername.clear();
             enterPassword.clear();
-            // Check if username exists
-            // Check if password exists and matches username (as in, 
-            // handleLogin?
-            
-            
-            // If finish set up false, finish set up
-          //  switchScene(finishSetUp());
-              switchScene(selectRole());
-            // If true, home/role page
-            handleButtonPress(); //Calls a private function to handle the button press
+			helloApp.HandleLoginAttempt(username, password);
 		}
 
 		// Register Handling (Submitting Invitation Code)
@@ -497,7 +499,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 		// Finish Set Up Handling 
 		else if (event.getSource() == finish) {
-            String username = enterEmail.getText();
+            String email = enterEmail.getText();
             String firstName = enterFirstName.getText();
             String middleName = enterMiddleName.getText();
             String lastName = enterLastName.getText();
@@ -509,21 +511,11 @@ public class GUIController implements EventHandler<ActionEvent>{
             enterLastName.clear();
             enterPreferredName.clear();
             
-            // If more than 1 role
-            
-            	// Go to role page 
-            
-            // If 1 role
-            
-            	// Go to home page
-            
-            // Will change to role page or home page
-            switchScene(login_page());
-            handleButtonPress(); //Calls a private function to handle the button press
+            helloApp.finishUserSetup(email, firstName, middleName, lastName, preferredName);
 		}
 
 
-		else if (event.getSource() == admin) {
+		else if (event.getSource() == admin) { 
 			switchScene(adminHomePage());
 		}
 		
@@ -562,30 +554,34 @@ public class GUIController implements EventHandler<ActionEvent>{
 			codeAlert.showAndWait();
 
 		}
-
+		
+		
 		else if (event.getSource() == resetUserPassword) {
 			String user = enterUser.getText();
 			// Check user exists
 			
 			// Set a one-time password and expiration date/time 
 			
-			// reset password to code 
+			// Give code/one-time pass to give to user 
+		}
+
+		else if (event.getSource() == setPass) {
+			// Check if passwords match
+			// If they do, reset pass
+			// Bring to login page
 		}
 
 		else if (event.getSource() == deleteUser) {
 			//.getText
 			// delete
 		}
-
 		else if (event.getSource() == listUsers) {
 			// list 
 		}
-
 		else if (event.getSource() == addRoleToUser) {
 			// .getText
 			// add
 		}
-
 		else if (event.getSource() == removeRoleFromUser) {
 			// .getText
 			// remove
@@ -594,24 +590,17 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 	
-	private void showAlert(String string) {
-		
-		okAlert = new Button();
-		okAlert.setText("OK");
-		
-		Label alert = new Label(string);
-		setupLabelUI(alert, "Arial", 18, windowX, 
-				Pos.CENTER, windowX/8, 30);
-		
-		Pane alertRoot = new Pane();
-		
-		alertRoot.getChildren().addAll(okAlert, alert);
-		
-		Scene alertScene = new Scene(alertRoot, windowX, windowY);
-		mainStage.setScene(alertScene);
-		mainStage.show();
-		
+	public void showAlert(String message) {
+	    // Create an Alert dialog
+	    Alert alert = new Alert(AlertType.INFORMATION);
+	    alert.setTitle("Information");
+	    alert.setHeaderText(null);
+	    alert.setContentText(message);
+
+	    // Make the dialog blocking (modal)
+	    alert.showAndWait();  // This method blocks until the user closes the dialog
 	}
+
 
 	/**************************************
 	 * Note: Stuff below not used much yet, got it from HW#5, will probably use to pretty up GUI soon
