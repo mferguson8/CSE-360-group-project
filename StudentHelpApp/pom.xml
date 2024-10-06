@@ -16,6 +16,9 @@
   <dependencies>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/main
    
 <<<<<<< HEAD
 =======
@@ -31,9 +34,12 @@
     </dependency>
 >>>>>>> 081d4a2 (fixed maven / java issues)
 =======
+<<<<<<< HEAD
 =======
    
 >>>>>>> main
+=======
+>>>>>>> origin/main
 
 <dependency>
     <groupId>com.h2database</groupId>
@@ -42,9 +48,13 @@
     <scope>runtime</scope>
 </dependency>   
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 79a98f4 (pom changes for h2 database. Added database role commands. Login logic)
 =======
 >>>>>>> main
+=======
+>>>>>>> 79a98f4 (pom changes for h2 database. Added database role commands. Login logic)
+>>>>>>> origin/main
 <dependency>
       <groupId>org.controlsfx</groupId>
       <artifactId>controlsfx</artifactId>

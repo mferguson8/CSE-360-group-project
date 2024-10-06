@@ -24,6 +24,9 @@ public class HelloApplication extends Application {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/main
     public void start(Stage primaryStage) {
 <<<<<<< HEAD
         //String test_txt = "test@test.com";
@@ -56,10 +59,13 @@ public class HelloApplication extends Application {
 
     public void start(@SuppressWarnings("exports") Stage primaryStage) {
 >>>>>>> 50db6e5 (handleLogin file)
+<<<<<<< HEAD
 =======
 
     public void start(@SuppressWarnings("exports") Stage primaryStage) {
 >>>>>>> main
+=======
+>>>>>>> origin/main
     	System.out.println("ASU Hello World!");
     	System.out.println("It started!");
         gui = new GUIController();
@@ -76,12 +82,18 @@ public class HelloApplication extends Application {
     	System.out.println("Button Pressed!");
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/main
     	
 >>>>>>> ec8ca11 (GUI Initial and GUIController and Application Interaction)
 =======
 >>>>>>> f1d25a6 (Added hashString function, which required 2 new imports)
+<<<<<<< HEAD
 =======
 >>>>>>> main
+=======
+>>>>>>> origin/main
     }
     
     public static String hashString(String input) {
