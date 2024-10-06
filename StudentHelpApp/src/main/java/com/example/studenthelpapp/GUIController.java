@@ -87,6 +87,7 @@ public class GUIController implements EventHandler<ActionEvent>{
     private Button listUsers;
     private Button addRoleToUser;
     private Button removeRoleFromUser;
+	private TextField enterUser; // Decide if ID or username 
     
     
     // UI components for instructor home page
@@ -290,6 +291,15 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 		invite = new Button();
 		invite.setText("Invite User");
+
+		/*
+		enterUser = new TextField();
+		enterUser.setPromptText("Enter the user (ID/name)"); // Decide ID or username
+
+		Label labelDecision = new Label("What do you want to do?");
+		setupLabelUI(labelDecision, "Arial", 12, windowX, 
+			Pos.CENTER, (windowX/2) + 20 , 30);
+			*/
 		
 		resetUser = new Button();
 		resetUser.setText("Reset User");
@@ -310,7 +320,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 		VBox adminHomeRoot = new VBox(20);
 		
-		adminHomeRoot.getChildren().addAll(adminLogout, invite, resetUser, deleteUser, listUsers, addRoleToUser, removeRoleFromUser);
+		adminHomeRoot.getChildren().addAll(invite, listUsers, enterUser, labelDecision, resetUser, deleteUser, addRoleToUser, removeRoleFromUser, adminLogout);
 
 		Scene adminHomeScene = new Scene(adminHomeRoot, windowX, windowY);
 		return adminHomeScene;
@@ -336,6 +346,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 		Scene inviteUserScene = new Scene(inviteUserRoot, windowX, windowY);
 		return inviteUserScene;
+	}
+
+	public Scene listUsers() {
+		// list
 	}
 	
 	/**
@@ -382,6 +396,15 @@ public class GUIController implements EventHandler<ActionEvent>{
 		Scene changePassScene = new Scene(changePassRoot, windowX, windowY);
 		return changePassScene;
 	}
+
+	public Scene addRoleToUser() {
+
+	}
+	
+	public Scene removeRoleFromUser() {
+
+	}
+
 	
 	
 	public Scene instructorHomePage() {
@@ -572,8 +595,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 		}
 
 		else if (event.getSource() == deleteUser) {
-			//.getText
-			// delete
+			String userToDelete = enterUser.getText();
+			// Are you sure alert
+			// If yes, delete
+			// If no, 
 		}
 		else if (event.getSource() == listUsers) {
 			// list 
