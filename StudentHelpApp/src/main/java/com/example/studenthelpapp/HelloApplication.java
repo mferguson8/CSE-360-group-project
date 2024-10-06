@@ -17,6 +17,7 @@ public class HelloApplication extends Application {
         launch(args);
     }
 
+<<<<<<< HEAD
     public void start(Stage primaryStage) {
 <<<<<<< HEAD
         //String test_txt = "test@test.com";
@@ -26,6 +27,11 @@ public class HelloApplication extends Application {
         //if (ers == Email.EmailResult.Status.SUCCESS) System.out.println(er.get_email().to_string());
         //else System.out.println(Email.EmailResult.parse_status(ers));
 
+=======
+    public void start(@SuppressWarnings("exports") Stage primaryStage) {
+        System.out.println("ASU Hello World!");
+        System.out.println("It started!");
+>>>>>>> 081d4a2 (fixed maven / java issues)
         primaryStage.setTitle("ASU Hello World Spring 2024");
         Button btn = new Button();
         btn.setText("Display: 'ASU says: Hello World!'");
