@@ -19,9 +19,18 @@ public class StrChecker {
         return !(isLower(c) || isUpper(c) || isAlpha(c) || isNumber(c));
     }
 
-    private static iGV(char c) { //is gmail valid
+    private static boolean iGV(char c) { //is gmail valid
         return isLower(c) ||
             isNumber(c) ||
             (c == '.');
+    }
+    public static boolean isANS(char c) { //is aaccepted name special, isAUNS - ia accepedt username special
+        if (!StrChecker.isSpecial(c)) return false;
+        final char[] ACCEPTED = {' ', '-', '\'', '.'};
+
+        for (int fv = 0; fv < ACCEPTED.length; fv++) {
+            if (ACCEPTED[fv] == c) return true;
+        }
+        return false;
     }
 }

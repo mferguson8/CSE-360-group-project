@@ -63,10 +63,10 @@ public class Name {
 
         private Status checkName(Position which) {
             if (!this.exists(which)) {
-                return DNE
+                return Status.DNE;
             }
 
-            return SUCCESS;
+            return Status.SUCCESS;
         }
 
         private NameResult(boolean hp, Name n) {
@@ -106,22 +106,11 @@ public class Name {
                 case PREFERRED:
                     return names.last;
             }
+            return null; //should be unreachable
         }
 
-
-
-        public static boolean isANS(char c) { //is aaccepted name special, isAUNS - ia accepedt username special
-            if (!StrChecker.isSpecial(c)) return false;
-            final char[] ACCEPTED = {' ', '-', '\'', '.'};
-
-            for (int fv = 0; fv < ACCEPTED.length; fv++) {
-                if (ACCEPEDT[fv] == c) return true;
-            }
-            return false;
-        }
-
-        public Status checkName(Position p) {
-            String tname = this.gSN(p);
+        public Status checkNV(Position p) { //check name valididty
+            String tname = this.gSName(p);
             if (tname == null) return Status.DNE;
             if (StrChecker.isNumber(tname.charAt(0))) return Status.HAS_SPEC;
 
@@ -133,15 +122,15 @@ public class Name {
                 cc = tname.charAt(fv);
                 in = StrChecker.isNumber(cc);
                 if (end_nums) {
-                    if(!in) return OOPN;
+                    if(!in) return Status.OOPN;
                 } else {
                     end_nums = in;
-                    if (StrChecker.isSpecial(cc) && (!StrChecker.isANS(cc))) return HAS_SPEC;
+                    if (StrChecker.isSpecial(cc) && (!StrChecker.isANS(cc))) return Status.HAS_SPEC;
                 }
 
 
             }
-            return SUCCESS;
+            return Status.SUCCESS;
         }
     }
 }

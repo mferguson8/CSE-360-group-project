@@ -64,7 +64,7 @@ public class RngStrGen {// random string generation
             curChar = sseed.charAt(fv);
             fvm1 = lfv % 8;
             fvm2 = lfv % 56; //sizeOf(long) - sizneOf(char) = 64 - 8 = 56
-            sub += (curChar & (1 << (fvm1))) != 0;
+            sub += ((curChar & (1 << (fvm1))) != 0) ? 1 : 0;
             lseed += curChar << fvm2 - sub;
         }
 
