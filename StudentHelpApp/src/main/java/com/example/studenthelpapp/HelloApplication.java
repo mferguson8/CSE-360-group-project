@@ -1,4 +1,4 @@
-package com.example.studenthelpapp;
+//package com.example.studenthelpapp;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -14,9 +14,14 @@ import java.security.NoSuchAlgorithmException;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+<<<<<<< HEAD
 	private int loggedInUserID;
 	private GUIController gui;
 	private DatabaseController database;
+=======
+	private int i = 0;
+	private GUIController gui;
+>>>>>>> Andrew
     public static void main(String[] args) {
         launch(args);
     }
@@ -27,6 +32,7 @@ public class HelloApplication extends Application {
     	System.out.println("It started!");
         gui = new GUIController();
         gui.initialize(primaryStage, this);
+<<<<<<< HEAD
        
     	database = new DatabaseController();
     	database.connectToDatabase();
@@ -176,5 +182,34 @@ public class HelloApplication extends Application {
     		//TODO: Check here for problems?
     	}
     	return inviteCode;
+=======
+     
+>>>>>>> Andrew
     }
+    
+    public void onButtonPressed() { //Called by GUIController when someone presses the button
+    	i++;
+    	gui.setTitle(String.valueOf(i));
+    	System.out.println("Button Pressed!");
+    }
+    
+    public static String hashString(String input) {
+    	try {
+	    	MessageDigest digester = MessageDigest.getInstance("SHA-256");
+	    	byte[] hashedBytes = digester.digest(input.getBytes());
+	    	
+	    	String hexString = "";
+	    	for(byte b: hashedBytes) {
+	    		hexString += String.format("%02x",b);
+	    	} 
+	        return hexString;
+	        
+    	} catch(NoSuchAlgorithmException e) {
+        	e.printStackTrace();
+        	return null;
+        }
+    }
+    
+    
+    
 }

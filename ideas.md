@@ -1,5 +1,5 @@
 # Security
-- passoword hashing (by/during phase 3)
+- password hashing (by/during phase 3)
 - anti SQL injection
 
 # Classes
@@ -9,15 +9,50 @@
 - Student
 - Admin
 - Student and admin
-- Intructor
+- Instructor
 - Admin and Instructor?
 - Student and Instructor?
 - Student, Instructor, and  Admin?
+
+### Data
+- username
+- password
+- email
+- role(s)
+
+#### Name
+- first
+- middle
+- last
+- preferred
+
+### LoginUser
+An established user logging in
+- username
+- salts and hashes password, before querying database
+- checks if new/unestablished user?
+
+#### Salt generation
+use username and raw password to set seed, and generate "random" salt
+
+### SetupUser
+A user finishing the setup of the account
+- Takes in name data
+- Takes in and verifies email
+
+### ActiveUser
+An active user
+- user ID
+
+#### Role
+Turn role into boolean indicating ability to perform a given action
+
 
 ### Admin Actions
 - delete account (requires confirmation/"are you sure?")
 - add/remove roles
 - log out
+
 
 #### Invite
 - one time code
@@ -60,7 +95,9 @@
 - Account creation
 - Testing
 
-
+#### Input verification
+- anti-SQL injection
+- well formed input
 
 ### Screencasts
 - Technical
