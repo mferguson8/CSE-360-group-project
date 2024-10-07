@@ -14,14 +14,9 @@ import java.security.NoSuchAlgorithmException;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
-<<<<<<< HEAD
 	private int loggedInUserID;
 	private GUIController gui;
 	private DatabaseController database;
-=======
-	private int i = 0;
-	private GUIController gui;
->>>>>>> Andrew
     public static void main(String[] args) {
         launch(args);
     }
@@ -32,8 +27,7 @@ public class HelloApplication extends Application {
     	System.out.println("It started!");
         gui = new GUIController();
         gui.initialize(primaryStage, this);
-<<<<<<< HEAD
-       
+
     	database = new DatabaseController();
     	database.connectToDatabase();
         	
