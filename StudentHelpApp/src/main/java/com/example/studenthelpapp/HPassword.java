@@ -30,7 +30,7 @@ public class HPassword { //hashed password
 
         }
 
-        private OTP(String notp) {
+        private OTP(String notp) { //notp - new otp
             this.otp = notp;
         }
 
