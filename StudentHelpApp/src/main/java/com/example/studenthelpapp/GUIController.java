@@ -1,4 +1,4 @@
-package com.example.studenthelpapp;
+//package com.example.studenthelpapp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,21 +40,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * Attributes
 	 * 
 	 *****************************************/
-=======
-//package com.example.studenthelpapp;
 
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
 
-import java.io.IOException;
-
-public class GUIController {
-	
 	// For easy change of window size
 	private int windowX = 500;
 	private int windowY = 500;
@@ -276,7 +263,7 @@ public class GUIController {
 	public Scene adminHomePage() { // ADD Textboxes where necessary
 		
 		adminLogout = new Button();
-		adminLogout.setText("Logout");
+ 		adminLogout.setText("Logout");
 		
 		invite = new Button();
 		invite.setText("Invite User");
@@ -349,48 +336,21 @@ public class GUIController {
 	 * Set title
 	 * @param title
 	 */
-=======
-	public void initialize(Stage mainStage, HelloApplication helloApp) {
-		this.mainStage = mainStage;
-		this.helloApp = helloApp;
-		
-		mainStage.setTitle("ASU Hello World Spring 2024");
-	        Button btn = new Button();
-	        btn.setText("Display: 'ASU says: Hello World!'");
-	        btn.setOnAction(new EventHandler<>() {
-	            public void handle(ActionEvent event) {
-	                System.out.println("ASU: Hello World!");
-	                handleButtonPress(); //Calls a private function to handle the button press
-	            }
-	        });
-
-	        StackPane root = new StackPane();
-	        root.getChildren().add(btn);
-	        mainScene = new Scene(root, 300, 250);
-	        mainStage.setScene(mainScene);
-	        mainStage.show();
-	}
-	
->>>>>>> Andrew
 	public void setTitle(String title) {
 		mainStage.setTitle(title);
 	}
 	
-<<<<<<< HEAD
-	
+
 	/**
 	 * Handle button press
 	 * Not used?
 	 * 
 	 */
-=======
->>>>>>> Andrew
 	private void handleButtonPress() { //Triggered when someone presses the button
 		if(helloApp != null) {
 			helloApp.onButtonPressed(); //Calls a function in HelloApplication
 		}
-<<<<<<< HEAD
-	}	
+	}
 	
 	/**
 	 * Handle button
@@ -575,8 +535,3 @@ public class GUIController {
 	
 }
 
-=======
-	}
-	
-}
->>>>>>> Andrew

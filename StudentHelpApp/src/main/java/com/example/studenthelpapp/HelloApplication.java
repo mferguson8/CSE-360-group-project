@@ -176,9 +176,6 @@ public class HelloApplication extends Application {
     		//TODO: Check here for problems?
     	}
     	return inviteCode;
-=======
-     
->>>>>>> Andrew
     }
     
     public void onButtonPressed() { //Called by GUIController when someone presses the button
