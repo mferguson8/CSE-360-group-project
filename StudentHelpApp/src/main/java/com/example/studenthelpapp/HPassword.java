@@ -2,8 +2,8 @@ public class HPassword { //hashed password
     String password;
 
     public static HPassword hashSalt(String rawPswd) { //hashes and salts a password
-        //TODO this function MUST be modified by Phase 3
         //This should NOT store actual password in memory
+        //TODO this function MUST be modified by Phase 3
         final RngStrGen rsg = new RngStrGen(true, true, true);
         final String SALT = rsg.seededGenerate(rawPswd.length(), 0); //TODO seed?
         return new HPassword(rawPswd);
@@ -38,7 +38,4 @@ public class HPassword { //hashed password
         public HPassword toHashed() {return HPassword.hashSalt(this.otp);}
 
     }
-
-
-
 }

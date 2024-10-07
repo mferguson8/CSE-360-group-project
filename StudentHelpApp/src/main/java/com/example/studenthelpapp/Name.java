@@ -51,17 +51,18 @@ public class Name {
             HAS_SPEC, //has special
             DNE, //does not exist
             OOPN, //out of place number
+            IS_NULL,
             SUCCESS
         }
 
-        private static enum Position {
+        public static enum Position {
             FIRST,
             MIDDLE,
             LAST,
             PREFERRED
         }
 
-        private Status checkName(Position which) {
+        private Status checkNE(Position which) { //check name exists
             if (!this.exists(which)) {
                 return Status.DNE;
             }

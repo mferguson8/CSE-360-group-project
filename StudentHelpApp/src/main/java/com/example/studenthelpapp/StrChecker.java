@@ -19,7 +19,7 @@ public class StrChecker {
         return !(isLower(c) || isUpper(c) || isAlpha(c) || isNumber(c));
     }
 
-    private static boolean iGV(char c) { //is gmail valid
+    public static boolean iGV(char c) { //is gmail valid
         return isLower(c) ||
             isNumber(c) ||
             (c == '.');
@@ -33,4 +33,12 @@ public class StrChecker {
         }
         return false;
     }
+
+// https://knowledge.validity.com/s/articles/What-are-the-rules-for-email-address-syntax?language=en_US
+    public static boolean iDV(char c) { //is domain valid
+        return isAlpha(c) ||
+            isNumber(c) ||
+            (c == '.') || (c =='-');
+    }
+
 }
