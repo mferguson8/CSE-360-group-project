@@ -41,13 +41,15 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * 
 	 *****************************************/
 
-
-	// For easy change of window size
-	private int windowX = 500;
-	private int windowY = 500;
-	
+	private Stage mainStage;
+	private HelloApplication helloApp;
 	
 	//////////////// Still need to add labels for all ////////////////////
+	
+	// For easy change of window size
+    private int windowX = 500;
+    private int windowY = 500;
+		
 	
 	
 	// UI components for account creation
@@ -351,7 +353,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 			helloApp.onButtonPressed(); //Calls a function in HelloApplication
 		}
 	}
-	
+
 	/**
 	 * Handle button
 	 */
@@ -534,4 +536,3 @@ public class GUIController implements EventHandler<ActionEvent>{
 	
 	
 }
-

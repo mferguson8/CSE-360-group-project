@@ -1,3 +1,5 @@
+package com.example.studenthelpapp;
+
 import java.util.Random;
 public class RngStrGen {// random string generation
     //for salt and otp generation

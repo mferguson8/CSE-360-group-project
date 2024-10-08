@@ -1,4 +1,4 @@
-//package com.example.studenthelpapp;
+package com.example.studenthelpapp;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -34,7 +34,8 @@ public class HelloApplication extends Application {
      
     }
     
-    public void onButtonPressed() { //Called by GUIController when someone presses the button
+    public void onButtonPressed() { 
+    	//Old testing function, now a placeholder for various unfinished functions
     	
     	System.out.println("Button Pressed!");
     }
@@ -43,12 +44,12 @@ public class HelloApplication extends Application {
     	try {
 	    	MessageDigest digester = MessageDigest.getInstance("SHA-256");
 	    	byte[] hashedBytes = digester.digest(input.getBytes());
+	    	StringBuilder hexString = new StringBuilder();
 	    	
-	    	String hexString = "";
 	    	for(byte b: hashedBytes) {
-	    		hexString += String.format("%02x",b);
+	    		hexString.append(String.format("%02x",b));
 	    	} 
-	        return hexString;
+	        return hexString.toString();
 	        
     	} catch(NoSuchAlgorithmException e) {
         	e.printStackTrace();
@@ -61,8 +62,8 @@ public class HelloApplication extends Application {
     	if(database.isDatabaseEmpty())
     	{
     		//If the database is empty then they are the first user, and the admin.
-    		//TODO: Create PasswordSalt
-    		String passwordSalt = "";
+    		
+    		String passwordSalt = ""; //TODO: Create PasswordSalt
     		String hashedPassword = hashString(password + passwordSalt);
     		System.out.println("Username: " + username);//TODO: REMOVE, JUST FOR TESTING
     		System.out.println("User password: " + password);//TODO: REMOVE, JUST FOR TESTING
@@ -99,6 +100,18 @@ public class HelloApplication extends Application {
     			loggedInUserID = userID;
     			
     			//Check if they need to reset their password
+    			int passwordResetCheck = database.checkIfPasswordResetRequired(userID);
+    			if(passwordResetCheck == 1) {
+    				//TODO: Here make sure we switch to the scene to reset their password. Have it call the resetUserPassword function here
+    				//and then log them out.
+    			} else if(passwordResetCheck == 2) {
+    				gui.showAlert("Temporary password has expired. Please contact an admin.");
+    				gui.switchScene(gui.login_page());
+    				loggedInUserID = -1;
+    			}
+    			//TODO: Add more error handling here for other values that checkIfPasswordResetRequired can return.
+    			
+    			
     			String firstName = database.getFirstNameById(userID); //Checking if registration is done or not?
     			if(firstName == null) {
     				//They need to register
@@ -144,6 +157,8 @@ public class HelloApplication extends Application {
     	//For creating a user when they join using an invite code.
     	//Designed to be called by the create account button handling.
     	
+    	//TODO: Before finally creating the account, check that the invite code is still valid?
+    	
     	//Generate Password Salt
     	String password_salt = ""; //TODO: Implement salt generation
     	String hashed_password = hashString(password + password_salt);
@@ -176,6 +191,7 @@ public class HelloApplication extends Application {
     		//TODO: Check here for problems?
     	}
     	return inviteCode;
+<<<<<<< HEAD
     }
     
     public void onButtonPressed() { //Called by GUIController when someone presses the button
@@ -199,8 +215,40 @@ public class HelloApplication extends Application {
         	e.printStackTrace();
         	return null;
         }
+=======
+
+>>>>>>> main
     }
     
     
+    public void adminResetPassword(int user_id) {
+    	String newPassword = "test123"; //TODO: Generate new randomized password
+    	String password_salt = database.getSaltById(user_id);
+    	String newHashedPassword = hashString(newPassword + password_salt);
+    	database.adminResetPassword(user_id, newHashedPassword); //Check here for problems? Handle errors from false output.
+    	gui.showAlert("The user's new password is: " + newPassword);
+    }
     
+    public void resetUserPassword(String newPassword) {
+    	if(loggedInUserID == -1) {
+    		System.err.print("Trying to reset the password of a user that isn't logged in.");
+    		gui.showAlert("An error has occured. Please talk to an admin");
+    		gui.switchScene(gui.login_page());
+    		return;
+    	}
+    	String password_salt = database.getSaltById(loggedInUserID);
+    	String hashed_password = hashString(newPassword+password_salt);
+    	boolean outcome = database.userResetPassword(loggedInUserID, hashed_password);
+    	if(outcome) {
+    		gui.showAlert("Password reset. Please login again using your new password");
+    		gui.switchScene(gui.login_page());
+    		loggedInUserID = -1;
+    	} else {
+    		System.err.print("Error occured during user password resetting.");
+    		gui.showAlert("An error has occured. Please talk to an admin");
+    		gui.switchScene(gui.login_page());
+    		loggedInUserID = -1;
+    	}
+    }
+ 
 }

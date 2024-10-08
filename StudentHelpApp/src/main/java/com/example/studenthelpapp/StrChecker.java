@@ -1,3 +1,5 @@
+package com.example.studenthelpapp;
+
 public class StrChecker {
     public static boolean isLower(char c) {
         return ('a' <= c) && (c <= 'z');

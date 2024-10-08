@@ -1,3 +1,5 @@
+package com.example.studenthelpapp;
+
 public class Name {
     String first;
     String middle;

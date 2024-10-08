@@ -2,6 +2,9 @@ package com.example.studenthelpapp;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 //TODO
 
@@ -180,22 +183,7 @@ class DatabaseController {
 		}
 		
 		
-		//This function might be useless currently, as it would never be called
-		public Integer getUserIdByEmail(String email) {
-			String query = "SELECT id FROM USERS WHERE email = ?";
-			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-		        pstmt.setString(1, email);
-		        ResultSet rs = pstmt.executeQuery();
-		        // Check if any rows were returned
-		        if (rs.next()) {
-		            return rs.getInt("id"); // Return the user ID if found
-		        }
-		    } catch (SQLException e) {
-		        e.printStackTrace();
-		    }
-		    return null; // Return null if user not found or error occurred
-			
-		}
+	
 		
 		public Integer getUserIdByUsername(String username) {
 			//gets the UserId provided the username
@@ -214,11 +202,6 @@ class DatabaseController {
 			
 		}
 		
-		/*//If we never login via email, this function is not needed
-		 * public boolean doesUserExist(String email) {
-			//Checks if a user exists by email, by attempting to get their ID.
-		    return getUserIdByEmail(email) != null;
-		}*/
 		
 		public boolean doesUserExist(String username) {
 			//Checks if a user exists by email, by attempting to get their ID.
@@ -362,20 +345,14 @@ class DatabaseController {
 		}
 		
 		public int[] getRoleIdList() {
-			int[] roleIntArr;
+			List<Integer> roleList = new ArrayList<>();
 			String getRoles = "SELECT role_id FROM ROLES";
 			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
 				ResultSet rs = pstmt.executeQuery();
-				rs.last();
-				int rolesFound = rs.getRow();
-				rs.beforeFirst();
-				roleIntArr = new int[rolesFound];
-				for(int i = 0; i < rolesFound; i++) {
-					if(rs.next()) {
-						roleIntArr[i] = rs.getInt("role_id");
-					}
+				while(rs.next()) {
+					roleList.add(rs.getInt("role_id"));
 				}
-				return roleIntArr;
+				return roleList.stream().mapToInt(Integer::intValue).toArray();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -383,7 +360,11 @@ class DatabaseController {
 		}
 		
 		public boolean registerUser(int user_id, String email, String first_name, String middle_name, String last_name, String preferred_name) {
-			String register = "UPDATE USERS SET email = ?, first_name = ?, middle_name = ?, last_name = ?, preferred_name = ? WHERE id = ?";
+			String register = "UPDATE USERS SET email = COALESCE(?, email), "
+					+ "first_name = COALESCE(?, first_name), "
+					+ "middle_name = COALESCE(?, middle_name), "
+					+ "last_name = COALESCE(?, last_name), "
+					+ "preferred_name = COALESCE(?, preferred_name) WHERE id = ?";
 			
 			try(PreparedStatement pstmt = connection.prepareStatement(register)) {
 				
@@ -465,19 +446,15 @@ class DatabaseController {
 		
 		public int[] getInviteCodeRoles(String invite_code) {
 			String getRoles = "SELECT role_id FROM ACCESSCODEROLES where access_code = ?";
+			List<Integer> roleList = new ArrayList<>();
 			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
 				pstmt.setString(1,invite_code);
-				ResultSet rs = pstmt.executeQuery();
-				rs.last();
-				int rolesFound = rs.getRow();
-				rs.beforeFirst();
-				int[] roleIntArr = new int[rolesFound];
-				for(int i = 0; i < rolesFound; i++) {
-					if(rs.next()) {
-						roleIntArr[i] = rs.getInt("role_id");
+				try(ResultSet rs = pstmt.executeQuery()) {
+					while(rs.next()) {
+						roleList.add(rs.getInt("role_id"));
 					}
+					return roleList.stream().mapToInt(Integer::intValue).toArray();
 				}
-				return roleIntArr;
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -495,6 +472,82 @@ class DatabaseController {
 				e.printStackTrace();
 			}
 			return false;
+		}
+		
+		
+		public boolean adminResetPassword(int user_id, String newHashedPassword) {
+			//Called when the admin wants to reset the user's password. 
+			String resetPassword = "UPDATE USERS SET hashed_password = ?, password_reset_flag = ?, password_reset_timeout = ? WHERE id = ?";
+			ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("UTC"));	//Uses UTC so time stamps are consistent.
+			ZonedDateTime resetTimeout = currentTime.plus(7, ChronoUnit.DAYS); //Hard coded 1 week. Easy change if needed.
+			Timestamp timeoutTimestamp = Timestamp.from(resetTimeout.toInstant());
+			try (PreparedStatement pstmt = connection.prepareStatement(resetPassword)) {
+				pstmt.setString(1,newHashedPassword);
+				pstmt.setBoolean(2,true);
+				pstmt.setTimestamp(3,timeoutTimestamp);
+				pstmt.setInt(4, user_id);
+				int rowsChanged = pstmt.executeUpdate();
+				return rowsChanged == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+			
+		}
+		
+		public boolean userResetPassword(int user_id, String newHashedPassword) {
+			//For when the user either manually changes their password (not sure if needed as a feature), or when they login after 
+			//Admin has reset their password.
+			String resetPassword = "UPDATE USERS SET hashed_password = ?, password_reset_flag = ? WHERE id = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(resetPassword)) {
+				pstmt.setString(1,newHashedPassword);
+				pstmt.setBoolean(2,false);	//Sets the password_reset_flag to false, no matter its current status. Might not be desired behavior, but seems good for now.
+				pstmt.setInt(3, user_id);
+				int rowsChanged = pstmt.executeUpdate();
+				return rowsChanged == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+			
+		}
+		
+		public int checkIfPasswordResetRequired(int user_id) {
+			//When the user logs in, we check if they need to reset their password.
+			
+			//Will return -1 if no results are returned or there is some error
+			//Will return 0 if their password_reset_flag is false
+			//Will return 1 if their password_reset_flag is true and it is before the timeout
+			//Will return 2 if their password_reset_flag is true but it is after the timeout
+			
+			String resetCheck = "SELECT password_reset_flag, password_reset_timeout FROM USERS WHERE id = ?";
+			ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("UTC"));	//Uses UTC so time stamps are consistent.
+			
+			try (PreparedStatement pstmt = connection.prepareStatement(resetCheck)) {
+				pstmt.setInt(1,user_id);
+				ResultSet rs = pstmt.executeQuery();
+				
+				if(rs.next()) {
+					Boolean passwordResetFlag = rs.getBoolean("password_reset_flag");
+					Timestamp passwordResetTimeout = rs.getTimestamp("password_reset_timeout");
+					
+					if(passwordResetFlag == null || !passwordResetFlag) {
+						return 0;
+					}
+					ZonedDateTime resetTimeout = passwordResetTimeout.toInstant().atZone(ZoneId.of("UTC"));
+					if(currentTime.isBefore(resetTimeout)) {
+						return 1;
+					} else {
+						return 2;
+					}
+				}
+				return -1;
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return -1;
+			
 		}
 		
 		
