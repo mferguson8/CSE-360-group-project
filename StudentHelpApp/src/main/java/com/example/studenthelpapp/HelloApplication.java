@@ -27,7 +27,7 @@ public class HelloApplication extends Application {
     	System.out.println("It started!");
         gui = new GUIController();
         gui.initialize(primaryStage, this);
-       
+
     	database = new DatabaseController();
     	database.connectToDatabase();
         	
@@ -184,7 +184,9 @@ public class HelloApplication extends Application {
     		//TODO: Check here for problems?
     	}
     	return inviteCode;
+
     }
+    
     
     public void adminResetPassword(int user_id) {
     	String newPassword = "test123"; //TODO: Generate new randomized password
@@ -215,6 +217,5 @@ public class HelloApplication extends Application {
     		loggedInUserID = -1;
     	}
     }
-    
-    
+ 
 }
