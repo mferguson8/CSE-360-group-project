@@ -191,7 +191,6 @@ public class HelloApplication extends Application {
     		//TODO: Check here for problems?
     	}
     	return inviteCode;
-<<<<<<< HEAD
     }
     
     public void onButtonPressed() { //Called by GUIController when someone presses the button
@@ -215,9 +214,6 @@ public class HelloApplication extends Application {
         	e.printStackTrace();
         	return null;
         }
-=======
-
->>>>>>> main
     }
     
     
