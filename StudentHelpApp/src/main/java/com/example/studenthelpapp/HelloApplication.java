@@ -34,9 +34,8 @@ public class HelloApplication extends Application {
      
     }
     
-    public void onButtonPressed() { 
-    	//Old testing function, now a placeholder for various unfinished functions
-    	
+    public void onButtonPressed() { //Called by GUIController when someone presses the button
+
     	System.out.println("Button Pressed!");
     }
     
@@ -57,6 +56,7 @@ public class HelloApplication extends Application {
         }
     }
     
+
     public void handleLoginAttempt(String username, String password) {
     	//First check if any users exist
     	if(database.isDatabaseEmpty())
@@ -181,8 +181,6 @@ public class HelloApplication extends Application {
     		gui.showAlert("That is not a valid invite code");
     	}
     }
-    
-    
     
     public String createInviteCode(int[] roles) {
     	String inviteCode = "1"; //TODO: Generate Invite Code
