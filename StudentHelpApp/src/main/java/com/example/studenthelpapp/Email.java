@@ -1,4 +1,4 @@
-//package com.example.studenthelpapp;
+package com.example.studenthelpapp;
 
 public class Email {
     // sections as dictated by: https://itstillworks.com/3-parts-email-address-22094.html
@@ -7,6 +7,7 @@ public class Email {
     String domain;
 
     public static EmailResult make_email(String input){
+        //TODO walk email backwards checking domain, at first (last) @ check username
         int at = input.indexOf('@');
         if (at == -1) {
             return EmailResult.make_invalid(EmailResult.Status.NO_DOM);

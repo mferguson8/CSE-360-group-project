@@ -1,4 +1,4 @@
-//package com.example.studenthelpapp;
+package com.example.studenthelpapp;
 
 public class Name {
     String first;
@@ -133,7 +133,26 @@ public class Name {
 
 
             }
+            this.setChecked(p, true);
             return Status.SUCCESS;
+        }
+
+        private void setChecked(Position p, boolean v) {
+            switch (p) {
+                case Position.FIRST:
+                    this.checkedF = v;
+                    break;
+                case Position.MIDDLE:
+                    this.checkedM = v;
+                    break;
+                case Position.LAST:
+                    this.checkedL = v;
+                    break;
+                case Position.PREFERRED:
+                    if (this.hasPreferred && v) this.checkedP = v;
+                    this.checkedP = false;
+
+            }
         }
     }
 }
