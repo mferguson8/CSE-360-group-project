@@ -1,4 +1,4 @@
-package com.example.studenthelpapp;
+//package com.example.studenthelpapp;
 
 public class Name {
     String first;

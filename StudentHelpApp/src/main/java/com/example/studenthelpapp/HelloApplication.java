@@ -1,4 +1,4 @@
-package com.example.studenthelpapp;
+//package com.example.studenthelpapp;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -193,28 +193,28 @@ public class HelloApplication extends Application {
     	return inviteCode;
     }
     
-    public void onButtonPressed() { //Called by GUIController when someone presses the button
-    	i++;
-    	gui.setTitle(String.valueOf(i));
-    	System.out.println("Button Pressed!");
-    }
+    //public void onButtonPressed() { //Called by GUIController when someone presses the button
+    //	i++;
+    //	gui.setTitle(String.valueOf(i));
+    //	System.out.println("Button Pressed!");
+    //}
     
-    public static String hashString(String input) {
-    	try {
-	    	MessageDigest digester = MessageDigest.getInstance("SHA-256");
-	    	byte[] hashedBytes = digester.digest(input.getBytes());
-	    	
-	    	String hexString = "";
-	    	for(byte b: hashedBytes) {
-	    		hexString += String.format("%02x",b);
-	    	} 
-	        return hexString;
-	        
-    	} catch(NoSuchAlgorithmException e) {
-        	e.printStackTrace();
-        	return null;
-        }
-    }
+    //public static String hashString(String input) {
+    //	try {
+	//    	MessageDigest digester = MessageDigest.getInstance("SHA-256");
+	//    	byte[] hashedBytes = digester.digest(input.getBytes());
+	//
+	//    	String hexString = "";
+	//    	for(byte b: hashedBytes) {
+	//    		hexString += String.format("%02x",b);
+	//    	}
+	//        return hexString;
+	//
+    //	} catch(NoSuchAlgorithmException e) {
+    //    	e.printStackTrace();
+    //    	return null;
+    //    }
+    //}
     
     
     public void adminResetPassword(int user_id) {

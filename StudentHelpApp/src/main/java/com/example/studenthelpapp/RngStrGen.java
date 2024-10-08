@@ -1,4 +1,4 @@
-package com.example.studenthelpapp;
+//package com.example.studenthelpapp;
 
 import java.util.Random;
 public class RngStrGen {// random string generation
