@@ -452,10 +452,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 		addInstructor.setPromptText("Instructor");
 
 		addStudent = new CheckBox();
-		addStudent.setPromptText("Student")
+		addStudent.setPromptText("Student");
 
 		addRole = new Button();
-		addRole.setText("Add")
+		addRole.setText("Add");
 
 		VBox addRoleRoot = new VBox(20);
 		
@@ -477,10 +477,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 		removeInstructor.setPromptText("Instructor");
 
 		removeStudent = new CheckBox();
-		removeStudent.setPromptText("Student")
+		removeStudent.setPromptText("Student");
 
 		removeRole = new Button();
-		removeRole.setText("Remove")
+		removeRole.setText("Remove");
 
 		VBox removeRoleRoot = new VBox(20);
 		
@@ -517,6 +517,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 		return studentHomeScene;
 	}
 	
+
+
 	
 	/**
 	 * Switch Scene
@@ -550,6 +552,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 		}
 	}	
 	
+
+
 	/**
 	 * Handle button
 	 */
@@ -687,6 +691,9 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 	
+
+
+
 	public void showAlert(String message) {
 	    // Create an Alert dialog
 	    Alert alert = new Alert(AlertType.INFORMATION);
@@ -697,6 +704,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 	    // Make the dialog blocking (modal)
 	    alert.showAndWait();  // This method blocks until the user closes the dialog
 	}
+
+
+
+
 
 
 	/**************************************
