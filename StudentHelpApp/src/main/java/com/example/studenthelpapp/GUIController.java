@@ -23,10 +23,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 
-// Notes: Need to fix role page (shouldn't show all roles unless they have them)
 // Notes: Didn't use original button handling
 // Add labels (stuff I can do myself though)
-// Better naming conventions?
 
 
 /**
@@ -87,7 +85,40 @@ public class GUIController implements EventHandler<ActionEvent>{
     private Button listUsers;
     private Button addRoleToUser;
     private Button removeRoleFromUser;
-	private TextField enterUser; // Decide if ID or username 
+	private TextField enterUserID; // Used for all scenes related to admin so far 
+
+	    // UI components for inviteUser
+    private String giveInvCode;   	// Give invite code - String for testing
+    private Button confirmRoles;	// Confirm roles given
+    private CheckBox selAdmin;   	// Select admin
+    private CheckBox selInstructor; // Select Instructor
+    private CheckBox selStudent;  	// Select Student
+    private Alert codeAlert;
+    
+    // UI components for resetUserPass 
+    private String date;   			// String for testing
+    private Button resetPass; 		// Button to reset password 
+    
+    // UI components for changePass   
+    private TextField newPass;
+    private TextField confirmNewPass; 
+    private Button setPass;
+
+	// UI components for addRoleToUser
+	private CheckBox addAdmin;
+	private CheckBox addInstructor;
+	private CheckBox addStudent;
+	private Button addRole;
+
+	// UI components for removeRoleFromUser
+	private CheckBox removeAdmin;
+	private CheckBox removeInstructor;
+	private CheckBox removeStudent;
+	private Button removeRole;
+
+	// UI components for delete user
+	private Button deleteUser;
+	private Alert sure;
     
     
     // UI components for instructor home page
@@ -100,9 +131,7 @@ public class GUIController implements EventHandler<ActionEvent>{
     private Button okAlert;
     private Label Alert;
     
-	
-	
-    
+
     /**
      * Initializer 
      * @param mainStage
@@ -358,8 +387,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 */
 	public Scene resetUserPass() { 
 		
-		enterUser = new TextField();
-		enterUser.setPromptText("Enter user to password reset: ");
+		enterUserID = new TextField();
+		enterUserID.setPromptText("Enter user to password reset: ");
 		
 		resetPass = new Button();
 		resetPass.setText("Reset");
@@ -397,16 +426,70 @@ public class GUIController implements EventHandler<ActionEvent>{
 		return changePassScene;
 	}
 
+	public Scene deleteUser() {
+
+		enterUserID = new TextField();
+		enterUserID.setPromptText("Enter the user id")
+
+		VBox deleteUserRoot = new VBox(20);
+
+		deleteUserRoot.getChildren().add(enterUserID);
+
+		Scene deleteUserScene = new Scene(deleteUserRoot, windowX, windowY);
+		return deleterUserScene;
+
+	}
+
 	public Scene addRoleToUser() {
 
+		enterUserID = new TextField();
+		enterUserID.setPromptText("Enter the user (ID/name)");
+
+		addAdmin = new CheckBox();
+		addAdmin.setPromptText("Admin");
+
+		addInstructor = new CheckBox();
+		addInstructor.setPromptText("Instructor");
+
+		addStudent = new CheckBox();
+		addStudent.setPromptText("Student")
+
+		addRole = new Button();
+		addRole.setText("Add")
+
+		VBox addRoleRoot = new VBox(20);
+		
+		addRoleRoot.getChildren().addAll(enterUserID, addAdmin, addInstructor, addStudent, addRole);
+		
+		Scene addRoleScene = new Scene(addRoleRoot, windowX, windowY);
+		return addRoleScene;
 	}
 	
 	public Scene removeRoleFromUser() {
 
+		enterUserID = new TextField();
+		enterUserID.setPromptText("Enter the user (ID/name)");
+
+		removeAdmin = new CheckBox();
+		removeAdmin.setPromptText("Admin");
+
+		removeInstructor = new CheckBox();
+		removeInstructor.setPromptText("Instructor");
+
+		removeStudent = new CheckBox();
+		removeStudent.setPromptText("Student")
+
+		removeRole = new Button();
+		removeRole.setText("Remove")
+
+		VBox removeRoleRoot = new VBox(20);
+		
+		removeRoleRoot.getChildren().addAll(enterUserID, removeAdmin, removeInstructor, removeStudent, removeRole);
+		
+		Scene removeRoleScene = new Scene(addRoleRoot, windowX, windowY);
+		return removeRoleScene;
 	}
 
-	
-	
 	public Scene instructorHomePage() {
 		
 		instructorLogout = new Button();
@@ -444,7 +527,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	    mainStage.setScene(newScene);
 	    mainStage.show();
 	}
-	
+
 
 	
 	/**
@@ -477,47 +560,32 @@ public class GUIController implements EventHandler<ActionEvent>{
 			String username = createUsername.getText();
 			String password1 = createPassword.getText();
 			String password2 = confirmPassword.getText();
-        
-			// check that username is valid
-			
-			// check that username does not already exist 
-			
-			// check password is valid
-			
-			// check passwords match
-			if(password1.equals(password2)) {
-				// 
-			}
-			else {
-				showAlert("Passwords do not match");
-			}
 
 			createUsername.clear();
 			createPassword.clear();
 			confirmPassword.clear();
-        
-			//switchScene(login_page());  // Messed up switchScene, so I'm just calling two function which seems inefficient 
-			handleButtonPress(); //Calls a private function to handle the button press
+
+			helloApp.createUser();
+
 		}
 
 		// Login Handling 
 		else if (event.getSource() == login) {
 			String username = enterUsername.getText();
             String password = enterPassword.getText();
+
             enterUsername.clear();
             enterPassword.clear();
+
 			helloApp.HandleLoginAttempt(username, password);
 		}
 
 		// Register Handling (Submitting Invitation Code)
 		else if (event.getSource() == register) {
             String code = enterCode.getText();
+			enterCode.clear();
 
-            enterCode.clear();
-            // Check that code is exists
-            
-            switchScene(create_account());
-            handleButtonPress(); //Calls a private function to handle the button press
+            helloApp.handleInviteCodeAttempt(); 
 		}
 
 		// Finish Set Up Handling 
@@ -571,6 +639,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 			*/
 			
 			// Just testing to get alert to work 
+
+			//helloApp.createInviteCode(roles);
 			codeAlert.setTitle("Invitation Code!");
 			codeAlert.setContentText("Code");
 			
@@ -580,22 +650,24 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 		
 		else if (event.getSource() == resetUserPassword) {
-			String user = enterUser.getText();
-			// Check user exists
-			
-			// Set a one-time password and expiration date/time 
-			
-			// Give code/one-time pass to give to user 
+			// check username exists?
+			String userID = enterUserID.getText();
+			helloApp.adminResetPassword(userID);
 		}
 
 		else if (event.getSource() == setPass) {
 			// Check if passwords match
-			// If they do, reset pass
-			// Bring to login page
+			String newPassword = newPass.getText();
+			resetUserPassword(newPassword);
 		}
 
 		else if (event.getSource() == deleteUser) {
-			String userToDelete = enterUser.getText();
+			String userToDelete = enterUserID.getText();
+
+			// I'll fix alert
+			sure.setTitle("Are you sure?")
+			sure.setContentText("This will be permanent. Are you sure you want to delete user " + userToDelete + "?");
+			sure.showAndWait();
 			// Are you sure alert
 			// If yes, delete
 			// If no, 
@@ -604,11 +676,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 			// list 
 		}
 		else if (event.getSource() == addRoleToUser) {
-			// .getText
+			String userID = enterUserID.getText();
 			// add
 		}
 		else if (event.getSource() == removeRoleFromUser) {
-			// .getText
+			String userID = enterUserID.getText();
 			// remove
 		}
 		
