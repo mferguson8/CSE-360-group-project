@@ -183,22 +183,7 @@ class DatabaseController {
 		}
 		
 		
-		//This function might be useless currently, as it would never be called
-		public Integer getUserIdByEmail(String email) {
-			String query = "SELECT id FROM USERS WHERE email = ?";
-			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-		        pstmt.setString(1, email);
-		        ResultSet rs = pstmt.executeQuery();
-		        // Check if any rows were returned
-		        if (rs.next()) {
-		            return rs.getInt("id"); // Return the user ID if found
-		        }
-		    } catch (SQLException e) {
-		        e.printStackTrace();
-		    }
-		    return null; // Return null if user not found or error occurred
-			
-		}
+	
 		
 		public Integer getUserIdByUsername(String username) {
 			//gets the UserId provided the username
@@ -217,11 +202,6 @@ class DatabaseController {
 			
 		}
 		
-		/*//If we never login via email, this function is not needed
-		 * public boolean doesUserExist(String email) {
-			//Checks if a user exists by email, by attempting to get their ID.
-		    return getUserIdByEmail(email) != null;
-		}*/
 		
 		public boolean doesUserExist(String username) {
 			//Checks if a user exists by email, by attempting to get their ID.
@@ -365,20 +345,14 @@ class DatabaseController {
 		}
 		
 		public int[] getRoleIdList() {
-			int[] roleIntArr;
+			List<Integer> roleList = new ArrayList<>();
 			String getRoles = "SELECT role_id FROM ROLES";
 			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
 				ResultSet rs = pstmt.executeQuery();
-				rs.last();
-				int rolesFound = rs.getRow();
-				rs.beforeFirst();
-				roleIntArr = new int[rolesFound];
-				for(int i = 0; i < rolesFound; i++) {
-					if(rs.next()) {
-						roleIntArr[i] = rs.getInt("role_id");
-					}
+				while(rs.next()) {
+					roleList.add(rs.getInt("role_id"));
 				}
-				return roleIntArr;
+				return roleList.stream().mapToInt(Integer::intValue).toArray();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -386,7 +360,11 @@ class DatabaseController {
 		}
 		
 		public boolean registerUser(int user_id, String email, String first_name, String middle_name, String last_name, String preferred_name) {
-			String register = "UPDATE USERS SET email = ?, first_name = ?, middle_name = ?, last_name = ?, preferred_name = ? WHERE id = ?";
+			String register = "UPDATE USERS SET email = COALESCE(?, email), "
+					+ "first_name = COALESCE(?, first_name), "
+					+ "middle_name = COALESCE(?, middle_name), "
+					+ "last_name = COALESCE(?, last_name), "
+					+ "preferred_name = COALESCE(?, preferred_name) WHERE id = ?";
 			
 			try(PreparedStatement pstmt = connection.prepareStatement(register)) {
 				
@@ -468,19 +446,15 @@ class DatabaseController {
 		
 		public int[] getInviteCodeRoles(String invite_code) {
 			String getRoles = "SELECT role_id FROM ACCESSCODEROLES where access_code = ?";
+			List<Integer> roleList = new ArrayList<>();
 			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
 				pstmt.setString(1,invite_code);
-				ResultSet rs = pstmt.executeQuery();
-				rs.last();
-				int rolesFound = rs.getRow();
-				rs.beforeFirst();
-				int[] roleIntArr = new int[rolesFound];
-				for(int i = 0; i < rolesFound; i++) {
-					if(rs.next()) {
-						roleIntArr[i] = rs.getInt("role_id");
+				try(ResultSet rs = pstmt.executeQuery()) {
+					while(rs.next()) {
+						roleList.add(rs.getInt("role_id"));
 					}
+					return roleList.stream().mapToInt(Integer::intValue).toArray();
 				}
-				return roleIntArr;
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -554,10 +528,10 @@ class DatabaseController {
 				ResultSet rs = pstmt.executeQuery();
 				
 				if(rs.next()) {
-					boolean passwordResetFlag = rs.getBoolean("password_reset_flag");
+					Boolean passwordResetFlag = rs.getBoolean("password_reset_flag");
 					Timestamp passwordResetTimeout = rs.getTimestamp("password_reset_timeout");
 					
-					if(!passwordResetFlag) {
+					if(passwordResetFlag == null || !passwordResetFlag) {
 						return 0;
 					}
 					ZonedDateTime resetTimeout = passwordResetTimeout.toInstant().atZone(ZoneId.of("UTC"));

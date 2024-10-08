@@ -34,7 +34,8 @@ public class HelloApplication extends Application {
      
     }
     
-    public void onButtonPressed() { //Called by GUIController when someone presses the button
+    public void onButtonPressed() { 
+    	//Old testing function, now a placeholder for various unfinished functions
     	
     	System.out.println("Button Pressed!");
     }
@@ -43,12 +44,12 @@ public class HelloApplication extends Application {
     	try {
 	    	MessageDigest digester = MessageDigest.getInstance("SHA-256");
 	    	byte[] hashedBytes = digester.digest(input.getBytes());
+	    	StringBuilder hexString = new StringBuilder();
 	    	
-	    	String hexString = "";
 	    	for(byte b: hashedBytes) {
-	    		hexString += String.format("%02x",b);
+	    		hexString.append(String.format("%02x",b));
 	    	} 
-	        return hexString;
+	        return hexString.toString();
 	        
     	} catch(NoSuchAlgorithmException e) {
         	e.printStackTrace();
@@ -61,8 +62,8 @@ public class HelloApplication extends Application {
     	if(database.isDatabaseEmpty())
     	{
     		//If the database is empty then they are the first user, and the admin.
-    		//TODO: Create PasswordSalt
-    		String passwordSalt = "";
+    		
+    		String passwordSalt = ""; //TODO: Create PasswordSalt
     		String hashedPassword = hashString(password + passwordSalt);
     		System.out.println("Username: " + username);//TODO: REMOVE, JUST FOR TESTING
     		System.out.println("User password: " + password);//TODO: REMOVE, JUST FOR TESTING
@@ -97,6 +98,8 @@ public class HelloApplication extends Application {
     			return;
     		} else if(loginAttempt) {
     			loggedInUserID = userID;
+    			
+    			//Check if they need to reset their password
     			int passwordResetCheck = database.checkIfPasswordResetRequired(userID);
     			if(passwordResetCheck == 1) {
     				//TODO: Here make sure we switch to the scene to reset their password. Have it call the resetUserPassword function here
@@ -106,7 +109,9 @@ public class HelloApplication extends Application {
     				gui.switchScene(gui.login_page());
     				loggedInUserID = -1;
     			}
-    			//Check if they need to reset their password
+    			//TODO: Add more error handling here for other values that checkIfPasswordResetRequired can return.
+    			
+    			
     			String firstName = database.getFirstNameById(userID); //Checking if registration is done or not?
     			if(firstName == null) {
     				//They need to register
@@ -151,6 +156,8 @@ public class HelloApplication extends Application {
     public void createUser(String invite_code, String username, String password) {
     	//For creating a user when they join using an invite code.
     	//Designed to be called by the create account button handling.
+    	
+    	//TODO: Before finally creating the account, check that the invite code is still valid?
     	
     	//Generate Password Salt
     	String password_salt = ""; //TODO: Implement salt generation
