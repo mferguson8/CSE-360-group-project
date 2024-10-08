@@ -2,6 +2,9 @@ package com.example.studenthelpapp;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 //TODO
 
@@ -495,6 +498,82 @@ class DatabaseController {
 				e.printStackTrace();
 			}
 			return false;
+		}
+		
+		
+		public boolean adminResetPassword(int user_id, String newHashedPassword) {
+			//Called when the admin wants to reset the user's password. 
+			String resetPassword = "UPDATE USERS SET hashed_password = ?, password_reset_flag = ?, password_reset_timeout = ? WHERE id = ?";
+			ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("UTC"));	//Uses UTC so time stamps are consistent.
+			ZonedDateTime resetTimeout = currentTime.plus(7, ChronoUnit.DAYS); //Hard coded 1 week. Easy change if needed.
+			Timestamp timeoutTimestamp = Timestamp.from(resetTimeout.toInstant());
+			try (PreparedStatement pstmt = connection.prepareStatement(resetPassword)) {
+				pstmt.setString(1,newHashedPassword);
+				pstmt.setBoolean(2,true);
+				pstmt.setTimestamp(3,timeoutTimestamp);
+				pstmt.setInt(4, user_id);
+				int rowsChanged = pstmt.executeUpdate();
+				return rowsChanged == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+			
+		}
+		
+		public boolean userResetPassword(int user_id, String newHashedPassword) {
+			//For when the user either manually changes their password (not sure if needed as a feature), or when they login after 
+			//Admin has reset their password.
+			String resetPassword = "UPDATE USERS SET hashed_password = ?, password_reset_flag = ? WHERE id = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(resetPassword)) {
+				pstmt.setString(1,newHashedPassword);
+				pstmt.setBoolean(2,false);	//Sets the password_reset_flag to false, no matter its current status. Might not be desired behavior, but seems good for now.
+				pstmt.setInt(3, user_id);
+				int rowsChanged = pstmt.executeUpdate();
+				return rowsChanged == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+			
+		}
+		
+		public int checkIfPasswordResetRequired(int user_id) {
+			//When the user logs in, we check if they need to reset their password.
+			
+			//Will return -1 if no results are returned or there is some error
+			//Will return 0 if their password_reset_flag is false
+			//Will return 1 if their password_reset_flag is true and it is before the timeout
+			//Will return 2 if their password_reset_flag is true but it is after the timeout
+			
+			String resetCheck = "SELECT password_reset_flag, password_reset_timeout FROM USERS WHERE id = ?";
+			ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("UTC"));	//Uses UTC so time stamps are consistent.
+			
+			try (PreparedStatement pstmt = connection.prepareStatement(resetCheck)) {
+				pstmt.setInt(1,user_id);
+				ResultSet rs = pstmt.executeQuery();
+				
+				if(rs.next()) {
+					boolean passwordResetFlag = rs.getBoolean("password_reset_flag");
+					Timestamp passwordResetTimeout = rs.getTimestamp("password_reset_timeout");
+					
+					if(!passwordResetFlag) {
+						return 0;
+					}
+					ZonedDateTime resetTimeout = passwordResetTimeout.toInstant().atZone(ZoneId.of("UTC"));
+					if(currentTime.isBefore(resetTimeout)) {
+						return 1;
+					} else {
+						return 2;
+					}
+				}
+				return -1;
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return -1;
+			
 		}
 		
 		

@@ -97,7 +97,15 @@ public class HelloApplication extends Application {
     			return;
     		} else if(loginAttempt) {
     			loggedInUserID = userID;
-    			
+    			int passwordResetCheck = database.checkIfPasswordResetRequired(userID);
+    			if(passwordResetCheck == 1) {
+    				//TODO: Here make sure we switch to the scene to reset their password. Have it call the resetUserPassword function here
+    				//and then log them out.
+    			} else if(passwordResetCheck == 2) {
+    				gui.showAlert("Temporary password has expired. Please contact an admin.");
+    				gui.switchScene(gui.login_page());
+    				loggedInUserID = -1;
+    			}
     			//Check if they need to reset their password
     			String firstName = database.getFirstNameById(userID); //Checking if registration is done or not?
     			if(firstName == null) {
@@ -177,4 +185,36 @@ public class HelloApplication extends Application {
     	}
     	return inviteCode;
     }
+    
+    public void adminResetPassword(int user_id) {
+    	String newPassword = "test123"; //TODO: Generate new randomized password
+    	String password_salt = database.getSaltById(user_id);
+    	String newHashedPassword = hashString(newPassword + password_salt);
+    	database.adminResetPassword(user_id, newHashedPassword); //Check here for problems? Handle errors from false output.
+    	gui.showAlert("The user's new password is: " + newPassword);
+    }
+    
+    public void resetUserPassword(String newPassword) {
+    	if(loggedInUserID == -1) {
+    		System.err.print("Trying to reset the password of a user that isn't logged in.");
+    		gui.showAlert("An error has occured. Please talk to an admin");
+    		gui.switchScene(gui.login_page());
+    		return;
+    	}
+    	String password_salt = database.getSaltById(loggedInUserID);
+    	String hashed_password = hashString(newPassword+password_salt);
+    	boolean outcome = database.userResetPassword(loggedInUserID, hashed_password);
+    	if(outcome) {
+    		gui.showAlert("Password reset. Please login again using your new password");
+    		gui.switchScene(gui.login_page());
+    		loggedInUserID = -1;
+    	} else {
+    		System.err.print("Error occured during user password resetting.");
+    		gui.showAlert("An error has occured. Please talk to an admin");
+    		gui.switchScene(gui.login_page());
+    		loggedInUserID = -1;
+    	}
+    }
+    
+    
 }
