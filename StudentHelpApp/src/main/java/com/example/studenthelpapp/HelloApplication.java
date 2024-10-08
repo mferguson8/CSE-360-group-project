@@ -182,38 +182,6 @@ public class HelloApplication extends Application {
     	}
     }
     
-    public void directToHomePageOrSelectRole(int userID) {
-    	//Only use on users that have been logged in. Check where you are getting the userID from.
-    	int[] roles = database.getUsersRoleIds(userID);
-		if(roles.length == 0) {
-			System.err.println("User ID: " + Integer.toString(userID) +" does not have any roles");
-			return;
-		} else if( roles.length == 1) {
-			if(roles[0] == 1) {
-				gui.switchScene(gui.adminHomePage());
-				System.out.println("Directed to Admin Homepage");
-			} else if(roles[0] == 2) {
-				gui.switchScene(gui.instructorHomePage());
-				System.out.println("Directed to Instructor Homepage");
-			} else if(roles[0] == 3) {
-				gui.switchScene(gui.studentHomePage());
-				System.out.println("Directed to Student Homepage");
-			}
-		} else if(roles.length > 1) {
-			gui.switchScene(gui.selectRole(roles));
-		}
-    }
-    
-
-    public void finishUserSetup(String email, String firstName, String middleName, String lastName, String preferredName) {
-    	boolean finished = database.registerUser(loggedInUserID, email, firstName, middleName, lastName, preferredName);
-    	if(finished) {
-    		directToHomePageOrSelectRole(loggedInUserID);
-    	}
-    }
-
-
-    
     public String createInviteCode(int[] roles) {
     	String inviteCode = "1"; //TODO: Generate Invite Code
     	for(int i: roles) {
