@@ -1,14 +1,20 @@
 package com.example.studenthelpapp;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 //TODO
-//Handle Invite Codes, adding new ones, and creating users from access codes
-//Handle Registering New Users
+
 //Handle Adding/changing data about current users
 //Handle admin listing users (user_name, first middle and last name, roles)
 
 //Note: Use SecureRandom to generate salts, and try to make them at least 20 characters
 //In addition, switch from SHA256 to bcrypt, scrypt, or Argon2 for better security.
+
+//Don't store database login and password in code, and change them.
 
 class DatabaseController {
 		// JDBC driver name and database URL 
@@ -16,26 +22,43 @@ class DatabaseController {
 		static final String DB_URL = "jdbc:h2:~/firstDatabase";  
 		
 		//The applications login credentials
-		static final String USER = "application_user"; 
-		static final String PASS = "surelyThereIsABetterWayToDoThis"; 
+		static final String USER = "sa"; 
+		static final String PASS = ""; 
 		
 		//Connection and Statement
 		private Connection connection = null;
 		private Statement statement = null; 
 		
 		
-		public void connectToDatabase() throws SQLException {
+		public void connectToDatabase() {
+			
 			try {
 				Class.forName(JDBC_DRIVER); // Load the JDBC driver
 				System.out.println("Connecting to database...");
 				connection = DriverManager.getConnection(DB_URL, USER, PASS);
 				statement = connection.createStatement(); 
+				wipeDatabase(); //TODO: This is for testing. Remove
+				
 				createTables();  // Create the necessary tables if they don't exist
+				System.out.println("Connected to database!");
 			} catch (ClassNotFoundException e) {
 				System.err.println("JDBC Driver not found: " + e.getMessage());
+			} catch (SQLException e) {
+				System.err.println("SQL ERROR CONNECTING: " + e.getMessage());
 			}
 		}
 		
+		
+		public void wipeDatabase() {
+		    String sql = "DROP ALL OBJECTS";
+		    try (Statement stmt = connection.createStatement()) {
+		        stmt.execute(sql);
+		        System.out.println("All objects in the database have been dropped.");
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    }
+		}
+
 		
 		private void createTables() throws SQLException {
 			//Creates these tables if they don't exist
@@ -58,7 +81,7 @@ class DatabaseController {
 					+ "preferred_name VARCHAR(20) NULL,"
 					+ "password_reset_flag BOOLEAN DEFAULT FALSE,"
 					+ "password_reset_timeout TIMESTAMP NULL,"
-					+ "password_salt VARCHAR(20) NOT NULL) ";
+					+ "password_salt VARCHAR(40) NOT NULL) ";
 			
 			//Table holds what users have what roles
 			String roleJunctionTable = "CREATE TABLE IF NOT EXISTS USERROLES ("
@@ -160,22 +183,7 @@ class DatabaseController {
 		}
 		
 		
-		//This function might be useless currently, as it would never be called
-		public Integer getUserIdByEmail(String email) {
-			String query = "SELECT id FROM USERS WHERE email = ?";
-			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
-		        pstmt.setString(1, email);
-		        ResultSet rs = pstmt.executeQuery();
-		        // Check if any rows were returned
-		        if (rs.next()) {
-		            return rs.getInt("id"); // Return the user ID if found
-		        }
-		    } catch (SQLException e) {
-		        e.printStackTrace();
-		    }
-		    return null; // Return null if user not found or error occurred
-			
-		}
+	
 		
 		public Integer getUserIdByUsername(String username) {
 			//gets the UserId provided the username
@@ -194,11 +202,6 @@ class DatabaseController {
 			
 		}
 		
-		/*//If we never login via email, this function is not needed
-		 * public boolean doesUserExist(String email) {
-			//Checks if a user exists by email, by attempting to get their ID.
-		    return getUserIdByEmail(email) != null;
-		}*/
 		
 		public boolean doesUserExist(String username) {
 			//Checks if a user exists by email, by attempting to get their ID.
@@ -270,8 +273,8 @@ class DatabaseController {
 		
 		public boolean createUser(String username, String hashed_password, String password_salt) {
 			//For initial user creation, you only need to specify the username, hashed_password, and password_salt
-			String insertion = "INSERT INTO USERS (username, hashed_password, password_salt)"
-					+ "VALUES (?, ?, ?)";
+			String insertion = "MERGE INTO USERS (username, hashed_password, password_salt)"
+					+ "KEY (username) VALUES (?, ?, ?)";
 			try (PreparedStatement pstmt = connection.prepareStatement(insertion)) {
 				pstmt.setString(1,username);
 				pstmt.setString(2,hashed_password);
@@ -284,8 +287,84 @@ class DatabaseController {
 			return false;
 		}
 		
+		public void changeUserRoles(int userID, int[] role) {
+			//For changing user roles		
+			int[] roleIntArr = getRoleIdList();
+			for(int i : roleIntArr) {
+				deleteRoleFromUser(userID, i);
+				for(int j: role) {
+					if(i == j) {
+						addRoleToUser(userID,i);
+					}
+				}
+			}
+		}
+		
+		public boolean addRoleToUser(int userID, int roleID) {
+			String addRole = "INSERT INTO USERROLES (user_id, role_id) VALUES (?, ?)";
+			try (PreparedStatement pstmt = connection.prepareStatement(addRole)) {
+				pstmt.setInt(1,userID);
+				pstmt.setInt(2,roleID);
+				int rowsAdded = pstmt.executeUpdate();
+				return rowsAdded == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
+		public boolean deleteRoleFromUser(int userID, int roleID) {
+			String deleteRole = "DELETE FROM USERROLES where user_id = ? AND role_id = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(deleteRole)) {
+				pstmt.setInt(1,userID);
+				pstmt.setInt(2,roleID);
+				int rowsDeleted = pstmt.executeUpdate();
+				return rowsDeleted == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
+		
+		public int[] getUsersRoleIds(int userID) {
+			List<Integer> roleList = new ArrayList<>();
+			String getRoles = "SELECT role_id FROM USERROLES WHERE user_id = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
+				pstmt.setInt(1,userID);
+				ResultSet rs = pstmt.executeQuery();
+				while(rs.next()) {
+					roleList.add(rs.getInt("role_id"));
+				}
+				int[] roleIntArr = roleList.stream().mapToInt(Integer::intValue).toArray();
+				return roleIntArr;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return new int[0];
+		}
+		
+		public int[] getRoleIdList() {
+			List<Integer> roleList = new ArrayList<>();
+			String getRoles = "SELECT role_id FROM ROLES";
+			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
+				ResultSet rs = pstmt.executeQuery();
+				while(rs.next()) {
+					roleList.add(rs.getInt("role_id"));
+				}
+				return roleList.stream().mapToInt(Integer::intValue).toArray();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return new int[0];
+		}
+		
 		public boolean registerUser(int user_id, String email, String first_name, String middle_name, String last_name, String preferred_name) {
-			String register = "UPDATE USERS SET email = ?, first_name = ?, middle_name = ?, last_name = ?, preferred_name = ? WHERE id = ?";
+			String register = "UPDATE USERS SET email = COALESCE(?, email), "
+					+ "first_name = COALESCE(?, first_name), "
+					+ "middle_name = COALESCE(?, middle_name), "
+					+ "last_name = COALESCE(?, last_name), "
+					+ "preferred_name = COALESCE(?, preferred_name) WHERE id = ?";
 			
 			try(PreparedStatement pstmt = connection.prepareStatement(register)) {
 				
@@ -336,6 +415,141 @@ class DatabaseController {
 		    
 			return false;
 		}
+		
+		public boolean checkIfInviteCodeValid(String invite_code) {
+			String getRows = "SELECT count(*) FROM ACCESSCODEROLES WHERE access_code = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(getRows)) {
+				pstmt.setString(1,invite_code);
+				ResultSet rs = pstmt.executeQuery();
+				if(rs.next()) {
+					int count = rs.getInt(1);
+					return count > 0;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
+		public boolean addInviteCodeRole(String invite_code, int role_id) {
+			String addRole = "INSERT INTO ACCESSCODEROLES (access_code, role_id) VALUES (?, ?)";
+			try (PreparedStatement pstmt = connection.prepareStatement(addRole)) {
+				pstmt.setString(1,invite_code);
+				pstmt.setInt(2,role_id);
+				int rowsAdded = pstmt.executeUpdate();
+				return rowsAdded == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
+		public int[] getInviteCodeRoles(String invite_code) {
+			String getRoles = "SELECT role_id FROM ACCESSCODEROLES where access_code = ?";
+			List<Integer> roleList = new ArrayList<>();
+			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
+				pstmt.setString(1,invite_code);
+				try(ResultSet rs = pstmt.executeQuery()) {
+					while(rs.next()) {
+						roleList.add(rs.getInt("role_id"));
+					}
+					return roleList.stream().mapToInt(Integer::intValue).toArray();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return new int[0];
+		}
+		
+		public boolean deleteInviteCodeRole(String invite_code, int role_id) {
+			String deleteRole = "DELETE FROM ACCESSCODEROLES where access_code = ? AND role_id = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(deleteRole)) {
+				pstmt.setString(1,invite_code);
+				pstmt.setInt(2,role_id);
+				int rowsDeleted = pstmt.executeUpdate();
+				return rowsDeleted == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+		}
+		
+		
+		public boolean adminResetPassword(int user_id, String newHashedPassword) {
+			//Called when the admin wants to reset the user's password. 
+			String resetPassword = "UPDATE USERS SET hashed_password = ?, password_reset_flag = ?, password_reset_timeout = ? WHERE id = ?";
+			ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("UTC"));	//Uses UTC so time stamps are consistent.
+			ZonedDateTime resetTimeout = currentTime.plus(7, ChronoUnit.DAYS); //Hard coded 1 week. Easy change if needed.
+			Timestamp timeoutTimestamp = Timestamp.from(resetTimeout.toInstant());
+			try (PreparedStatement pstmt = connection.prepareStatement(resetPassword)) {
+				pstmt.setString(1,newHashedPassword);
+				pstmt.setBoolean(2,true);
+				pstmt.setTimestamp(3,timeoutTimestamp);
+				pstmt.setInt(4, user_id);
+				int rowsChanged = pstmt.executeUpdate();
+				return rowsChanged == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+			
+		}
+		
+		public boolean userResetPassword(int user_id, String newHashedPassword) {
+			//For when the user either manually changes their password (not sure if needed as a feature), or when they login after 
+			//Admin has reset their password.
+			String resetPassword = "UPDATE USERS SET hashed_password = ?, password_reset_flag = ? WHERE id = ?";
+			try (PreparedStatement pstmt = connection.prepareStatement(resetPassword)) {
+				pstmt.setString(1,newHashedPassword);
+				pstmt.setBoolean(2,false);	//Sets the password_reset_flag to false, no matter its current status. Might not be desired behavior, but seems good for now.
+				pstmt.setInt(3, user_id);
+				int rowsChanged = pstmt.executeUpdate();
+				return rowsChanged == 1;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return false;
+			
+		}
+		
+		public int checkIfPasswordResetRequired(int user_id) {
+			//When the user logs in, we check if they need to reset their password.
+			
+			//Will return -1 if no results are returned or there is some error
+			//Will return 0 if their password_reset_flag is false
+			//Will return 1 if their password_reset_flag is true and it is before the timeout
+			//Will return 2 if their password_reset_flag is true but it is after the timeout
+			
+			String resetCheck = "SELECT password_reset_flag, password_reset_timeout FROM USERS WHERE id = ?";
+			ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("UTC"));	//Uses UTC so time stamps are consistent.
+			
+			try (PreparedStatement pstmt = connection.prepareStatement(resetCheck)) {
+				pstmt.setInt(1,user_id);
+				ResultSet rs = pstmt.executeQuery();
+				
+				if(rs.next()) {
+					Boolean passwordResetFlag = rs.getBoolean("password_reset_flag");
+					Timestamp passwordResetTimeout = rs.getTimestamp("password_reset_timeout");
+					
+					if(passwordResetFlag == null || !passwordResetFlag) {
+						return 0;
+					}
+					ZonedDateTime resetTimeout = passwordResetTimeout.toInstant().atZone(ZoneId.of("UTC"));
+					if(currentTime.isBefore(resetTimeout)) {
+						return 1;
+					} else {
+						return 2;
+					}
+				}
+				return -1;
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return -1;
+			
+		}
+		
 		
 		public void closeConnection() {
 			//Closes the statement and connection to the database

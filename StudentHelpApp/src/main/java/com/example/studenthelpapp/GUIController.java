@@ -23,6 +23,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -36,7 +37,12 @@ import javafx.scene.control.Alert.AlertType;
 // Logout - take back to login page, but sets logged in as false, make all logout buttons the same
 
 // NOTES: Didn't use original button handling
-// Add labels (stuff I can do myself though)
+
+// Notes: Need to fix role page (shouldn't show all roles unless they have them)
+// Notes: switchScene useless?
+// Notes: Didn't use original button handling
+
+// Better naming conventions?
 
 
 /**
@@ -51,16 +57,17 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * Attributes
 	 * 
 	 *****************************************/
+	
+	
 	private Stage mainStage;
-	private Scene mainScene;
 	private HelloApplication helloApp;
 	
-	// For easy change of window size
-	private int windowX = 500;
-	private int windowY = 500;
-	
-	
 	//////////////// Still need to add labels for all ////////////////////
+	
+	// For easy change of window size
+		private int windowX = 500;
+		private int windowY = 500;
+		
 	
 	
 	// UI components for account creation
@@ -145,7 +152,9 @@ public class GUIController implements EventHandler<ActionEvent>{
     private Button okAlert;
     private Label Alert;
     
+
     private String inviteCode; // Only used to store the invite code for a few functions. Be careful how you use this. 
+
 
     /**
      * Initializer 
@@ -162,6 +171,24 @@ public class GUIController implements EventHandler<ActionEvent>{
      * Create account 
      */
     public Scene create_account(String invite_code) {		
+			
+    		this.inviteCode = invite_code;
+    	
+			createUsername = new TextField(); 
+			createUsername.setPromptText("Create a username: ");
+			
+			createPassword = new TextField(); 
+			createPassword.setPromptText("Create a password: ");
+			
+			confirmPassword = new TextField();
+			confirmPassword.setPromptText("Confirm your password: ");
+			
+			
+			createAccount = new Button();
+			createAccount.setText("Create Account"); 
+	        
+			createAccount.setOnAction(this); 
+	            
 
 		// Currently, it is a VBox, so some of the positioning stuff on the labels don't matter, but I am leaving it
 		// as I may change it anyway (plus it still has the font and all that)
@@ -348,24 +375,32 @@ public class GUIController implements EventHandler<ActionEvent>{
 			*/
 		
 		resetUser = new Button();
-		resetUser.setText("Reset User");
 		resetUser.setOnAction(this);
+
+		resetUser.setText("Reset User Password");
+
 		
 		deleteUser = new Button();
 		deleteUser.setText("Delete User");
+
 		deleteUser.setOnAction(this);
+
 		
 		listUsers = new Button();
 		listUsers.setText("List Users");
 		listUsers.setOnAction(this);
 		
 		addRoleToUser = new Button();
-		addRoleToUser.setText("Add Role");
 		addRoleToUser.setOnAction(this);
+
+		addRoleToUser.setText("Add Role to User");
+
 		
 		removeRoleFromUser = new Button();
-		removeRoleFromUser.setText("Remove Role");
 		removeRoleFromUser.setOnAction(this);
+
+		removeRoleFromUser.setText("Remove Role from User");
+	
 		
 		
 		
@@ -633,6 +668,9 @@ public class GUIController implements EventHandler<ActionEvent>{
 		backButton = new Button();
 		backButton.setText("Back");	
 		backButton.setOnAction(this);
+
+		instructorLogout.setText("Logout");
+
 		
 		VBox instructorHomeRoot = new VBox(20);
 		
@@ -652,6 +690,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 		backButton = new Button();
 		backButton.setText("Back");	
 		backButton.setOnAction(this);
+		studentLogout.setText("Logout");
+
 		
 		VBox studentHomeRoot = new VBox(20);
 		
@@ -661,8 +701,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 		return studentHomeScene;
 	}
 	
-
-
 	
 	/**
 	 * Switch Scene
@@ -673,8 +711,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 	    mainStage.setScene(newScene);
 	    mainStage.show();
 	}
-
-
 	
 	/**
 	 * Set title
@@ -696,8 +732,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 		}
 	}	
 	
-
-
 	/**
 	 * Handle button
 	 */
@@ -712,12 +746,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 			String password1 = createPassword.getText();
 			String password2 = confirmPassword.getText();
 
-			createUsername.clear();
-			createPassword.clear();
-			confirmPassword.clear();
 			
-			//switchScene(login_page()); // For testing getting to scenes 			
 			
+			// check password is valid
+			
+			// check passwords match
 			if(password1.equals(password2)) {
 				createUsername.clear();
 				createPassword.clear();
@@ -729,8 +762,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 				showAlert("Passwords do not match");
 			}
 
+
 		}
-		
 
 		// Login Handling 
 		else if (event.getSource() == login) {
@@ -740,17 +773,19 @@ public class GUIController implements EventHandler<ActionEvent>{
             enterUsername.clear();
             enterPassword.clear();
             
+
         	helloApp.handleLoginAttempt(username, password);
+
 		}
 
 		// Register Handling (Submitting Invitation Code)
 		else if (event.getSource() == register) {
-            String code = enterCode.getText();
-			enterCode.clear();
-			
-		//	switchScene(create_account(code));
-
-            helloApp.handleInviteCodeAttempt(code); 
+           
+			String code = enterCode.getText();
+            enterCode.clear();
+            // Check that code is exists
+            
+            helloApp.handleInviteCodeAttempt(code);
 		}
 
 		// Finish Set Up Handling 
@@ -767,12 +802,14 @@ public class GUIController implements EventHandler<ActionEvent>{
             enterLastName.clear();
             enterPreferredName.clear();
             
-         //   switchScene(login_page());
+            
             helloApp.finishUserSetup(email, firstName, middleName, lastName, preferredName);
 		}
 
+		
+		else if (event.getSource() == admin) {
+			System.out.print("Admin Button Pressed");
 
-		else if (event.getSource() == admin) { 
 			switchScene(adminHomePage());
 		}
 		
@@ -876,12 +913,12 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 		
 		
+	
+		
+		
+		
 	}
 	
-	
-
-
-
 	public void showAlert(String message) {
 	    // Create an Alert dialog
 	    Alert alert = new Alert(AlertType.INFORMATION);
@@ -892,11 +929,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 	    // Make the dialog blocking (modal)
 	    alert.showAndWait();  // This method blocks until the user closes the dialog
 	}
-
-
-
-
-
 
 	/**************************************
 	 * Note: Stuff below not used much yet, got it from HW#5, will probably use to pretty up GUI soon
@@ -960,3 +992,4 @@ public class GUIController implements EventHandler<ActionEvent>{
 	
 	
 }
+
