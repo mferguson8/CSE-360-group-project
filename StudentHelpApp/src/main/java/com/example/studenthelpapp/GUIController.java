@@ -177,7 +177,8 @@ public class GUIController implements EventHandler<ActionEvent>{
      * Create account 
      */
     public Scene create_account(String invite_code) {		
-			
+			//For when a user has submitted a valid invite code,
+    		//We allow them to enter a username and password (has to match twice)
     		this.inviteCode = invite_code;
     	
 			createUsername = new TextField(); 
@@ -241,9 +242,10 @@ public class GUIController implements EventHandler<ActionEvent>{
      * @param helloApp
      */
 	public Scene login_page() {
-		
+		//Gives the user the option to login with a username and password, or enter an invite code they were provided
+		//which will take them to a page that allows them to setup an account
 		mainStage.setTitle("Login or Register");
-		
+			
 			Label labelEnterUsername = new Label("Enter the username here: ");
 			setupLabelUI(labelEnterUsername, "Arial", 12, windowX, 
 					Pos.BASELINE_LEFT, (windowX/8) + 20 , 30);
@@ -291,7 +293,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * Finish set up Scene
 	 */
 	public Scene finishSetUp() {
-		
+		//For when a user logs in and needs to finish registration. Allows them to enter
+		//email, first name, middle name, last name, preferred name
 		enterEmail = new TextField(); 
 		enterEmail.setPromptText("Enter email: ");
 		
@@ -329,6 +332,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * Incomplete, or need more scenes so that only the one's that apply show up
 	 */
 	public Scene selectRole(int[] roles) { 
+		//Scene for when someone with multiple roles logs in. Provides them a button for each role they have
+		//And will choose which role they are logged in as for this session, and take them to the associated homepage.
 		List<Button> roleButtons = new ArrayList<>();
 		
 		for(int i: roles) {
@@ -362,6 +367,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * @return
 	 */
 	public Scene adminHomePage() { 
+		
+		//Admin homepage, which allows them to
+		//Logout, Generate an invite code, Reset a user's password, Delete a user, List users,
+		//Add a role to a user, or remove a role from a user.
 		
 		adminLogout = new Button();
 		adminLogout.setText("Logout");
@@ -419,6 +428,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 
 	public Scene inviteUser() {
+		//For when the admin wants to generate an invite code,
+		//and has to select the associated roles
 		
 		selAdmin = new CheckBox();
 		selAdmin.setText("Admin");
@@ -448,8 +459,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 	
 	
-	//////// TESTING ONLY, WILL DELETE //////////////
-	/////// USED FOR listUser (below) IN PLACE OF ACTUAL USERS CLASS ///////////////
+	//Small class for loading user data into the table
 	public static class User {
 		private String username;
 		private String firstName;
@@ -476,41 +486,35 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 	}
 	
-	///////// END TESTING ////////////
-
 	/**
 	 * Finish list 
 	 */
-	public Scene listUsers(/*List<User> users*/) { // If using the TESTING getItems, take away parameter
+	public Scene listUsers(/*List<User> users*/) { 
+		//Scene for when the admin wants to list users.
+		//Will list all users in a table
+		//Only lists users username, First and Last name, and role ids
+		
+		
 		// users from Users class 
 		TableView<User> userTable = new TableView<>();
 		List<User> users = new ArrayList<>();
 		String userString = helloApp.listUsers();
-		String[] rows = userString.split("\n");
+		String[] rows = userString.split("\n"); //Split the string on \n, so each user is a row
 		for(String row: rows) {
-			if(row.trim().isEmpty())
+			if(row.trim().isEmpty()) //For last substring, potentially empty
 			{
 				continue;
 			}
-			String[] parts = row.split(",",3);
+			String[] parts = row.split(",",3);//Split on the first 2 commas, but not the ones in the square brackets
 			String username = parts[0].trim();
 			String name = parts[1].trim();
 			String codes = parts[2].trim();
-			users.add(new User(username, name, codes));
+			users.add(new User(username, name, codes)); //Add to a list
 		}
 		
-		// TESTING, long list to test scrolling works properly, will be deleted
-		/*userTable.getItems().addAll(new User("User_A", "Name_A", "[1,2]"),
-				new User("User_B", "Name_B", "[1,2]"), new User("User_C", "Name_C", "[1,2]"),
-				new User("User_D", "Name_D", "[1,2]"), new User("User_E", "Name_E", "[1,2]"), new User("User_A", "Name_A", "[1,2]"),
-				new User("User_B", "Name_B", "[1,2]"), new User("User_C", "Name_C", "[1,2]"),
-				new User("User_D", "Name_D", "[1,2]"), new User("User_E", "Name_E", "[1,2]"), new User("User_A", "Name_A", "[1,2]"),
-				new User("User_B", "Name_B", "[1,2]"), new User("User_C", "Name_C", "[1,2]"));
-		*/
-				///////////////
 		
 		userTable.getItems().addAll(users);
-		
+		//Setup table columns, which will fetch using the get functions.
 		TableColumn<User, String> usernameColumn = new TableColumn<>("Username");
 		TableColumn<User, String> nameColumn = new TableColumn<>("First Name");
 		TableColumn<User, String> codeColumn = new TableColumn<>("Role Codes");
@@ -542,7 +546,9 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * @return
 	 */
 	public Scene resetUserPass() { 
-		
+		//Scene for when the admin wants to trigger a password reset for a given user.
+		//Will provide the admin with a temporary password, which they will give to the user. 
+		//The user has 7 days to login after the password is generated, and they will be forced to change it.  
 		enterUserID = new TextField();
 		enterUserID.setPromptText("Enter Username for user to password reset: ");
 		
@@ -568,7 +574,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * @return
 	 */
 	public Scene changePass() {
-		
+		//For when a user is being forced to change their password, after an admin initiated a password reset on them
 		newPass = new TextField();
 		newPass.setPromptText("Enter your new password: ");
 		
@@ -591,7 +597,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 
 	public Scene deleteUser() {
-
+		//Scene for when the admin wants to delete a user, (has to provide their username)
 		enterUserID = new TextField();
 		enterUserID.setPromptText("Enter the Username of the user to delete");
 		
@@ -613,7 +619,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 
 	public Scene addRoleToUser() {
-
+		//Scene for when the admin wants to add a role to a user, (has to provide their username)
 		enterUserID = new TextField();
 		enterUserID.setPromptText("Enter the Username");
 
@@ -643,7 +649,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 	public Scene removeRoleFromUser() {
-
+		//Scene for when the admin wants to remove a role from a user, (has to provide their username)
 		enterUserID = new TextField();
 		enterUserID.setPromptText("Enter the Username");
 
@@ -673,12 +679,13 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 
 	public Scene instructorHomePage() {
-		
+		//The homepage for instructors (or multi-roles that chose instructors)
+				//Only has logout as of now
 		instructorLogout = new Button();
 		//instructorLogout.setText("Instructor");
 		instructorLogout.setOnAction(this);
 		
-		//Removed back button from this. We don't want no back button on home pages.
+		
 
 		instructorLogout.setText("Logout");
 
@@ -693,7 +700,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 	
 	
 	public Scene studentHomePage() {
-		
+		//The homepage for students (or multi-roles that chose students)
+		//Only has logout as of now
 		studentLogout = new Button();
 		//studentLogout.setText("Student");
 		studentLogout.setOnAction(this);
@@ -711,10 +719,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 	
 	/**
 	 * Switch Scene
-	 * May be obsolete/implemented wrong
 	 * @param newScene
 	 */
 	public void switchScene(Scene newScene) {
+		//Switches displayed scene to the provided scene
 	    mainStage.setScene(newScene);
 	    mainStage.show();
 	}
@@ -724,6 +732,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * @param title
 	 */
 	public void setTitle(String title) {
+		//Sets the window title to provided string.
 		mainStage.setTitle(title);
 	}
 	
@@ -734,9 +743,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * Handle button
 	 */
 	public void handle(ActionEvent event) {
-		
-		// NOTES
-		// I commented out the calls to HelloApplication temporarily to test just switching scenes
+		//Function handles all button presses
 		
 		// Create Account Handling 
 		if(event.getSource() == createAccount) {
@@ -746,15 +753,15 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 			
 			
-			// check password is valid
-			
 			// check passwords match
 			if(password1.equals(password2)) {
 				createUsername.clear();
 				createPassword.clear();
 				confirmPassword.clear();
+				//Calls createUser for logic handling
 				helloApp.createUser(this.inviteCode, username, password1);
-				this.inviteCode = null;
+				this.inviteCode = null; 
+				//Removes storage of inviteCode, no longer needed in GUIController at this point
 			}
 			else {
 				showAlert("Passwords do not match");
@@ -770,8 +777,9 @@ public class GUIController implements EventHandler<ActionEvent>{
 
             enterUsername.clear();
             enterPassword.clear();
+           
             
-
+            //Passes typed username and password to helloApp for logic.
         	helloApp.handleLoginAttempt(username, password);
 
 		}
@@ -781,13 +789,14 @@ public class GUIController implements EventHandler<ActionEvent>{
            
 			String code = enterCode.getText();
             enterCode.clear();
-            // Check that code is exists
+            // Calls handleInviteCodeAttempt, which will check the validity and manage next steps
             
             helloApp.handleInviteCodeAttempt(code);
 		}
 
 		// Finish Set Up Handling 
 		else if (event.getSource() == finish) {
+			//For when the user has entered their email on the finish registration scene
             String email = enterEmail.getText();
             String firstName = enterFirstName.getText();
             String middleName = enterMiddleName.getText();
@@ -795,7 +804,7 @@ public class GUIController implements EventHandler<ActionEvent>{
             String preferredName = enterPreferredName.getText();
             
            
-            
+            //Call email_check, and display various alerts for various access codes
             Email.EmailResult email_check = Email.make_email(email);
             switch(email_check.check()) {
             	case NO_DOM:
@@ -809,9 +818,12 @@ public class GUIController implements EventHandler<ActionEvent>{
             		return;
             	case SUCCESS:
             }
+            
+            //Call name_check
             Name.NameResult name_check;
             Name.NameResult.Position[] positionsToCheck;
             if(preferredName.trim().isEmpty()) {
+            	//Checks if there is a preferred name entered, to choose which function to call
             	name_check = Name.noPreferred(firstName, middleName, lastName);
             	positionsToCheck = new Name.NameResult.Position[]{Name.NameResult.Position.FIRST, 
             			Name.NameResult.Position.MIDDLE,
@@ -826,6 +838,7 @@ public class GUIController implements EventHandler<ActionEvent>{
             Name names = name_check.getName();
             if(names == null) {
             	StringBuilder nameError = new StringBuilder();
+            	//StringBuilder to build a potentially long string listing all the requirements not met.
             	nameError.append("Names don't meet the following requirements:");
 	            for(Name.NameResult.Position currentPosition: positionsToCheck) {
             		switch(name_check.checkNV(currentPosition)) {
@@ -851,45 +864,52 @@ public class GUIController implements EventHandler<ActionEvent>{
 	          //TODO: Test this.
             }
             
-            
-            
-            
-            
             enterEmail.clear();
             enterFirstName.clear();
             enterMiddleName.clear();
             enterLastName.clear();
             enterPreferredName.clear();
             
-            
+            //Call the userSetup function
             helloApp.finishUserSetup(email, firstName, middleName, lastName, preferredName);
 		}
 
 		
 		else if (event.getSource() == admin) {
-			System.out.print("Admin Button Pressed");
-
+			//For when the user with the admin role presses admin, to login as a admin this session
 			switchScene(adminHomePage());
 		}
 		
 		else if (event.getSource() == instructor) {
+			//For when the user with the instructor role presses instructor, to login as a instructor this session
 			switchScene(instructorHomePage());
 		}
 		
 		else if (event.getSource() == student) {
+			//For when the user with the student role presses student, to login as a student this session
 			switchScene(studentHomePage());
 		}
 		
 		else if (event.getSource() == invite) {
+			//For when the admin pressed the Invite button on the admin homepage
 			switchScene(inviteUser());
 		}
 		
 		else if (event.getSource() == confirmRoles) {
+			//For when the admin has chosen what roles for the invite code
 			boolean adminSelected = selAdmin.isSelected();
 			boolean instructorSelected = selInstructor.isSelected();
 			boolean studentSelected = selStudent.isSelected();
+			
+			//Ensure they have selected a role
+			if((!adminSelected) && (!instructorSelected) && (!studentSelected)) {
+				showAlert("Must select at least 1 role");
+				return;
+			}
+			
 			codeAlert = new Alert(AlertType.INFORMATION);
 			List<Integer> roles = new ArrayList<>();
+			//Add the selected roles to a list
 			if(adminSelected) {
 				roles.add(RoleCodes.ADMIN.get());
 			}
@@ -900,21 +920,24 @@ public class GUIController implements EventHandler<ActionEvent>{
 				roles.add(RoleCodes.STUDENT.get());
 			}
 			int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
+			//Create the invite code
 			String code = helloApp.createInviteCode(roleArr);
-			
+			//Display the invite code
 			codeAlert.setTitle("Invitation Code!");
 			codeAlert.setContentText("The invitation code is: "+code);
 			
 			codeAlert.showAndWait();
-			// Need to fix this stuff
+			
 			switchScene(adminHomePage());
 		}
 		
 		
 		else if (event.getSource() == resetPass) {
+			//Get the userId for the username the admin entered
 			String username = enterUserID.getText();
 			Integer id = helloApp.getUsernameId(username);
 			if(id != null) {
+				//if the id is valid, reset that user's password
 				enterUserID.clear();
 				helloApp.adminResetPassword(id);
 				switchScene(adminHomePage());
@@ -924,11 +947,14 @@ public class GUIController implements EventHandler<ActionEvent>{
 		}
 
 		else if (event.getSource() == setPass) {
+			//For when the user is forced to reset their password by an admin doing resetPassword on them
+			
 			// Check if passwords match
 			String newPassword = newPass.getText();
 			String copyPassword = confirmNewPass.getText();
 			if(newPassword.equals(copyPassword))
 			{
+				//Reset their password to the new password
 				newPass.clear();
 				confirmNewPass.clear();
 				helloApp.resetUserPassword(newPassword);
@@ -949,9 +975,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 			switchScene(deleteUser());
 		}
 		else if (event.getSource() == deleteUserButton) {
+			//Get the userID of that username and check if its valid
 			String userToDelete = enterUserID.getText();
 			Integer id = helloApp.getUsernameId(userToDelete);
 			if(id != null) {
+				//Get confirmation that they want to delete this user
 				sure = new Alert(AlertType.CONFIRMATION);
 				sure.setTitle("Are you sure?");
 				sure.setContentText("This will be permanent. Are you sure you want to delete user " + userToDelete + "?");
@@ -960,6 +988,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 				sure.getButtonTypes().setAll(yesButton, noButton);
 				Optional<ButtonType> result = sure.showAndWait();
 				if(result.isPresent() && (result.get() == yesButton)) {
+					//If they press yes, delete the user
 					enterUserID.clear();
 					helloApp.deleteUser(id);
 				} else if(result.isPresent() && (result.get() == noButton)) {
@@ -971,15 +1000,20 @@ public class GUIController implements EventHandler<ActionEvent>{
 		}
 		
 		else if (event.getSource() == listUsers) {
-			switchScene(listUsers());
+			//When an admin presses the listUsers button on the admin homepage
+			switchScene(listUsers()); //Switch to the listUsers scene
 		}
 		else if (event.getSource() == addRoleToUser) {
+			//When an admin presses the addRoleToUser button on the admin homepage
+			//Switch to the addRole scene
 			switchScene(addRoleToUser());
 		} else if (event.getSource() == addRole) {
+			//Gets the provided username and checkbox selections
 			String username = enterUserID.getText();
 			boolean adminSelected = addAdmin.isSelected();
 			boolean instructorSelected = addInstructor.isSelected();
 			boolean studentSelected = addStudent.isSelected();
+			//If the username is valid, add the role codes to a list
 			Integer id = helloApp.getUsernameId(username);
 			if(id != null) {
 				enterUserID.clear();
@@ -993,9 +1027,13 @@ public class GUIController implements EventHandler<ActionEvent>{
 				if(studentSelected) {
 					roles.add(RoleCodes.STUDENT.get());
 				}
+			
 				int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
+				//Add those roles from the id for that username
 				helloApp.addRoles(id, roleArr);
+				//Display a success
 				showAlert("Roles added");
+				//Go to the homepage
 				switchScene(adminHomePage());
 			} else {
 				showAlert("No user found with that username");
@@ -1004,13 +1042,17 @@ public class GUIController implements EventHandler<ActionEvent>{
 		}
 		
 		else if (event.getSource() == removeRoleFromUser) {
+			//When an admin presses the removeRoleFromUser button on the admin homepage
+			//Switch to the removeRole scene
 			switchScene(removeRoleFromUser());
 		}
 		else if (event.getSource() == removeRole) {
+			//Gets the provided username and checkbox selections
 			String username = enterUserID.getText();
 			boolean adminSelected = removeAdmin.isSelected();
 			boolean instructorSelected = removeInstructor.isSelected();
 			boolean studentSelected = removeStudent.isSelected();
+			//If the username is valid, add the role codes to a list
 			Integer id = helloApp.getUsernameId(username);
 			if(id != null) {
 				enterUserID.clear();
@@ -1025,8 +1067,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 					roles.add(RoleCodes.STUDENT.get());
 				}
 				int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
+				//Remove those roles from the id for that username
 				helloApp.removeRoles(id, roleArr);
+				//Display a success
 				showAlert("Roles removed");
+				//Go to the homepage
 				switchScene(adminHomePage());
 			} else {
 				showAlert("No user found with that username");
@@ -1035,19 +1080,23 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 		
 		else if (event.getSource() == backButton) {
+			//When the back button is pressed on any admin functionality page
+			//Take them back to the admin homepage
 			switchScene(adminHomePage());
 		}
 		else if (event.getSource() == adminLogout) {
-			//helloApp.logoutCurrentUser();
-			//switchScene(login_page());
-			//TODO TESTING, FIX
-			showAlert("Test123");
+			//When the logout button is pressed, log out the user
+			helloApp.logoutCurrentUser();
+			switchScene(login_page());
+			
 		}
 		else if (event.getSource() == instructorLogout) {
+			//When the logout button is pressed, log out the user
 			helloApp.logoutCurrentUser();
 			switchScene(login_page());
 		}
 		else if (event.getSource() == studentLogout) {
+			//When the logout button is pressed, log out the user
 			helloApp.logoutCurrentUser();
 			switchScene(login_page());
 		}

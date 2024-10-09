@@ -441,6 +441,9 @@ class DatabaseController {
 		}
 		
 		public int[] getRoleIdList() {
+			//Returns an int array of all the roles in the ROLES table.
+			//Should just return [1,2,3]
+			//If there is an error, returns an empty int array
 			List<Integer> roleList = new ArrayList<>();
 			String getRoles = "SELECT role_id FROM ROLES";
 			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
@@ -456,6 +459,9 @@ class DatabaseController {
 		}
 		
 		public boolean registerUser(int user_id, String email, String first_name, String middle_name, String last_name, String preferred_name) {
+			//Used during user registration.
+			//For the given user_id, updates email, first_name, middle_name, last_name, and preferred_name
+			//They will be kept null if the String passed is null.
 			String register = "UPDATE USERS SET email = COALESCE(?, email), "
 					+ "first_name = COALESCE(?, first_name), "
 					+ "middle_name = COALESCE(?, middle_name), "
@@ -513,6 +519,9 @@ class DatabaseController {
 		}
 		
 		public boolean checkIfInviteCodeValid(String invite_code) {
+			//Checks if any roles are associate with that invite code.
+			//Returns a boolean. Success means at least 1 role is associate with that code. 
+			//Failure means error, no invite code found, or no roles associate with that code.
 			String getRows = "SELECT count(*) FROM ACCESSCODEROLES WHERE access_code = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(getRows)) {
 				pstmt.setString(1,invite_code);
@@ -528,6 +537,9 @@ class DatabaseController {
 		}
 		
 		public boolean addInviteCodeRole(String invite_code, int role_id) {
+			//Adds the given invite code association with the given role id. 
+			//Returns a boolean of success or failure.
+			//Will fail if that invite code already exists
 			String addRole = "INSERT INTO ACCESSCODEROLES (access_code, role_id) VALUES (?, ?)";
 			try (PreparedStatement pstmt = connection.prepareStatement(addRole)) {
 				pstmt.setString(1,invite_code);
@@ -541,6 +553,8 @@ class DatabaseController {
 		}
 		
 		public int[] getInviteCodeRoles(String invite_code) {
+			//returns an int array of all role_ids associated with the given invite_code
+			//if error, no invite code found, or no roles attached, returns an empty int array of size 0
 			String getRoles = "SELECT role_id FROM ACCESSCODEROLES where access_code = ?";
 			List<Integer> roleList = new ArrayList<>();
 			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
@@ -558,6 +572,10 @@ class DatabaseController {
 		}
 		
 		public boolean deleteInviteCodeRole(String invite_code, int role_id) {
+			//Removes an access code with the given role from the ACCESSCODEROLES table.
+			//Used when someone creates an account with that invite code (or if we want to delete access codes)
+			//For removing the invite code entirely (like when account is created), 
+			//call for each role_id associate with that invite code
 			String deleteRole = "DELETE FROM ACCESSCODEROLES where access_code = ? AND role_id = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(deleteRole)) {
 				pstmt.setString(1,invite_code);
@@ -573,6 +591,8 @@ class DatabaseController {
 		
 		public boolean adminResetPassword(int user_id, String newHashedPassword) {
 			//Called when the admin wants to reset the user's password. 
+			//Returns a boolean indicating success or failure.
+			//User's have their password_reset_flag set to true, and a Timestamp in UTC of current time + 7 days.
 			String resetPassword = "UPDATE USERS SET hashed_password = ?, password_reset_flag = ?, password_reset_timeout = ? WHERE id = ?";
 			ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.of("UTC"));	//Uses UTC so time stamps are consistent.
 			ZonedDateTime resetTimeout = currentTime.plus(7, ChronoUnit.DAYS); //Hard coded 1 week. Easy change if needed.
@@ -648,6 +668,10 @@ class DatabaseController {
 		
 		
 		public String listUsers() {
+			//Designed to be used for the admin list users functionality
+			//Returns a string formatted in the following way
+			//"username, First_name Last_Name, [1,2,3]\n" for each user. The '[1,2,3]' contains their role IDs.
+			//For all users the string is build like this, and returns a single long string.
 			StringBuilder userList = new StringBuilder();
 			
 			String getUsers = "SELECT id, username, first_name, last_name FROM USERS";
@@ -675,6 +699,7 @@ class DatabaseController {
 		
 		public void closeConnection() {
 			//Closes the statement and connection to the database
+			//Not currently used
 			try{ 
 				if(statement!=null) statement.close(); 
 			} catch(SQLException se2) { 
