@@ -3,6 +3,7 @@ package com.example.studenthelpapp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -24,17 +25,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 
-// (for self)
-// TO DO: 
-// Alert for delete user
-	// Fix alerts in other places as well
-// Add back buttons (have some)
-// Logout - take back to login page, but sets logged in as false, make all logout buttons the same
-
-// NOTES: Didn't use original button handling
-// Add labels (stuff I can do myself though)
+// TO DO (Alysa) 
+	// Add comments
+	// Add different types of backButton (May not be necessary for phase 1)
 
 
 /**
@@ -143,7 +139,11 @@ public class GUIController implements EventHandler<ActionEvent>{
     // Show Alert
     private Button okAlert;
     private Label Alert;
+
+	// Back Buttons 
+	private Button backButton; // Back to admin home
     
+
     private String inviteCode; // Only used to store the invite code for a few functions. Be careful how you use this. 
 
 
@@ -155,14 +155,13 @@ public class GUIController implements EventHandler<ActionEvent>{
     public void initialize(Stage mainStage, HelloApplication helloApp) {
     	this.mainStage = mainStage;
 		this.helloApp = helloApp;
-		//switchScene(login_page()); // Placeholder 
-		switchScene(adminHomePage()); //TODO FOR TEST. MUST REMOVE
+		switchScene(login_page()); // Placeholder 
     }
     
     /**
      * Create account 
      */
-    public Scene create_account(String invite_code) {		
+       public Scene create_account(String invite_code) {		
 
     	setTitle("Create Account");
 
@@ -347,15 +346,15 @@ public class GUIController implements EventHandler<ActionEvent>{
 		List<Button> roleButtons = new ArrayList<>();
 		
 		for(int i: roles) {
-			if(i == RoleCodes.ADMIN.get()) {
+			if(i == 1) {
 				admin = new Button("Admin");
 				admin.setOnAction(this);
 				roleButtons.add(admin);
-			} else if (i == RoleCodes.INSTRUCTOR.get()) {
+			} else if (i == 2) {
 				instructor = new Button("Instructor");
 				instructor.setOnAction(this);
 				roleButtons.add(instructor);
-			} else if (i == RoleCodes.STUDENT.get()) {
+			} else if (i == 3) {
 				student = new Button("Student");
 				student.setOnAction(this);
 				roleButtons.add(student);
@@ -406,42 +405,32 @@ public class GUIController implements EventHandler<ActionEvent>{
 				Pos.BASELINE_LEFT, (windowX/6) - 60, (windowY/2) - 70);
 		
 		resetUser = new Button();
-		resetUser.setText("Reset User");
+		setupButtonUI(resetUser, "Reset a User", 200, Pos.CENTER, (windowX/6) - 60, (windowY/2) - 50);
 		resetUser.setOnAction(this);
-
-		resetUser.setText("Reset User Password");
-
 		
 		Label labelDeleteUser = new Label("Permanently delete a user: ");
 		setupLabelUI(labelDeleteUser, "Arial", 12, windowX, 
 				Pos.BASELINE_LEFT, (2*windowX/3) - 60, (windowY/2) - 70);
 		
 		deleteUser = new Button();
-		deleteUser.setText("Delete User");
+		setupButtonUI(deleteUser, "Delete a User", 200, Pos.CENTER, (2*windowX/3) - 60, (windowY/2) - 50);
 		deleteUser.setOnAction(this);
-
 		
 		Label labelAddRole= new Label("Permanently delete a user: ");
 		setupLabelUI(labelAddRole, "Arial", 12, windowX, 
 				Pos.BASELINE_LEFT, (windowX/6) - 60, (3*windowY/4) - 70);
 		
 		addRoleToUser = new Button();
-		addRoleToUser.setText("Add Role");
+		setupButtonUI(addRoleToUser, "Add Role To User", 200, Pos.CENTER, (windowX/6) - 60, (3*windowY/4) - 50);
 		addRoleToUser.setOnAction(this);
-
-		addRoleToUser.setText("Add Role to User");
-
 		
 		Label labelRemoveRole = new Label("Permanently delete a user: ");
 		setupLabelUI(labelRemoveRole, "Arial", 12, windowX, 
 				Pos.BASELINE_LEFT, (2*windowX/3) - 60, (3*windowY/4) - 70);
 		
 		removeRoleFromUser = new Button();
-		removeRoleFromUser.setText("Remove Role");
+		setupButtonUI(removeRoleFromUser, "Remove Role From User", 200, Pos.CENTER, (2*windowX/3) - 60, (3*windowY/4) - 50);
 		removeRoleFromUser.setOnAction(this);
-
-		removeRoleFromUser.setText("Remove Role from User");
-	
 		
 		logout = new Button();
 		setupButtonUI(logout, "Logout", 100, Pos.CENTER, (windowX/2) - 50, windowY - 50);
@@ -499,37 +488,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 
 
-	
-	
-	//////// TESTING ONLY, WILL DELETE //////////////
-	/////// USED FOR listUser (below) IN PLACE OF ACTUAL USERS CLASS ///////////////
-	public static class User {
-		private String username;
-		private String firstName;
-		private int code;
-		
-		public User(String username, String firstName, int code) {
-			this.username = username;
-			this.firstName = firstName;
-			this.code = code;
-		}
-		
-		public String getUsername() {
-			return username;
-		}
-		
-		public String getFirstName() {
-			return firstName;
-		}
-		
-		public int getCode() {
-			return code;
-		}
-		
-	}
-	
-	///////// END TESTING ////////////
-
 	/**
 	 * Finish list 
 	 */
@@ -538,24 +496,21 @@ public class GUIController implements EventHandler<ActionEvent>{
 		setTitle("List Users");
 		// users from Users class 
 		TableView<User> userTable = new TableView<>();
+		List<User> users = new ArrayList<>();
+		String userString = helloApp.listUsers();
+		String[] rows = userString.split("\n");
+		for(String row: rows) {
+			if(row.trim().isEmpty())
+			{
+				continue;
+			}
+			String[] parts = row.split(",",3);
+			String username = parts[0].trim();
+			String name = parts[1].trim();
+			String codes = parts[2].trim();
+			users.add(new User(username, name, codes));
+		}
 		
-		// userTable.getItems().addAll(users);
-		
-		// TESTING, long list to test scrolling works properly, will be deleted
-		userTable.getItems().addAll(new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5), new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5), new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5), new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5), new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5), new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5));
-		///////////////
 		
 		userTable.getItems().addAll(users);
 		
@@ -602,7 +557,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 				Pos.BASELINE_LEFT, 10, 50);
 		
 		enterUserID = new TextField();
-		enterUserID.setPromptText("Enter user to password reset: ");
+		setupTextUI(enterUserID, "Arial", 12, windowX - 20, Pos.BASELINE_LEFT, 10, 70 , "Enter User ID: ");
 		
 		resetPass = new Button();
 		setupButtonUI(resetPass, "Reset", 100, Pos.CENTER, (windowX/2) - 50, 100);
@@ -620,43 +575,24 @@ public class GUIController implements EventHandler<ActionEvent>{
 		return resetUserScene;
 		
 	}
-	
-	/**
-	 * For user to reset password after given code 
-	 * @return
-	 */
-	public Scene changePass() {
-		
-		newPass = new TextField();
-		newPass.setPromptText("Enter your new password: ");
-		
-		confirmNewPass = new TextField(); 
-		confirmNewPass.setPromptText("Confirm your password: ");
-		
-		setPass = new Button();
-		setPass.setText("Change Password");
-		setPass.setOnAction(this);
-		
-		backButton = new Button();
-		backButton.setText("Back");	
-		backButton.setOnAction(this);
-		
-		
-		VBox changePassRoot = new VBox(20);
-		
-		changePassRoot.getChildren().addAll(newPass, confirmNewPass, setPass, backButton);
-		
-		Scene changePassScene = new Scene(changePassRoot, windowX, windowY);
-		return changePassScene;
-	}
 
 	public Scene deleteUser() {
-
+		
+		setTitle("Delete User");
+		
+		Label labelDeletePass = new Label("Delete a User Permanently");
+		setupLabelUI(labelDeletePass, "Arial", 14, windowX, 
+				Pos.CENTER, 1, 10);
+		
+		Label labelUserID = new Label("Enter the user's ID: ");
+		setupLabelUI(labelUserID, "Arial", 12, windowX, 
+				Pos.BASELINE_LEFT, 10, 50);
+		
 		enterUserID = new TextField();
-		enterUserID.setPromptText("Enter the user id");
+		setupTextUI(enterUserID, "Arial", 12, windowX - 20, Pos.BASELINE_LEFT, 10, 70 , "Enter User ID: ");
 		
 		deleteUser = new Button();
-		deleteUser.setText("Delete");
+		setupButtonUI(deleteUser, "Delete", 100, Pos.CENTER, (windowX/2) - 50, 100);
 		deleteUser.setOnAction(this);
 		
 		backButton = new Button();
@@ -664,7 +600,9 @@ public class GUIController implements EventHandler<ActionEvent>{
 		backButton.setOnAction(this);
 			
 
-		deleteUserRoot.getChildren().addAll(enterUserID, deleteUser, backButton);
+		Pane deleteUserRoot = new Pane();
+
+		deleteUserRoot.getChildren().addAll(labelUserID, labelDeletePass, enterUserID, deleteUser, backButton);
 
 		Scene deleteUserScene = new Scene(deleteUserRoot, windowX, windowY);
 		return deleteUserScene;
@@ -681,6 +619,12 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 		enterUserID = new TextField();
 		enterUserID.setPromptText("Enter the user (ID/name)");
+		setupTextUI(enterUserID, "Arial", 12, windowX - 20, Pos.BASELINE_LEFT, 10, 40 , "Enter User ID: ");
+		
+		Label labelAddRoles = new Label("Please check which roles you want to add to the user: ");
+		setupLabelUI(labelAddRoles, "Arial", 14, windowX, 
+				Pos.BASELINE_LEFT, 1, 80);
+		
 
 		addAdmin = new CheckBox();
 		addAdmin.setText("Admin");
@@ -723,6 +667,12 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 		enterUserID = new TextField();
 		enterUserID.setPromptText("Enter the user (ID/name)");
+		setupTextUI(enterUserID, "Arial", 12, windowX - 20, Pos.BASELINE_LEFT, 10, 40 , "Enter User ID: ");
+		
+		Label labelRemoveRoles = new Label("Please check which roles you want to remove from the user: ");
+		setupLabelUI(labelRemoveRoles, "Arial", 14, windowX, 
+				Pos.BASELINE_LEFT, 1, 80);
+		
 
 		removeAdmin = new CheckBox();
 		removeAdmin.setText("Admin");
@@ -754,35 +704,14 @@ public class GUIController implements EventHandler<ActionEvent>{
 		Scene removeRoleScene = new Scene(removeRoleRoot, windowX, windowY);
 		return removeRoleScene;
 	}
-
-	public Scene instructorHomePage() {
-		
-		instructorLogout = new Button();
-		instructorLogout.setText("Instructor");
-		instructorLogout.setOnAction(this);
-		
-		backButton = new Button();
-		backButton.setText("Back");	
-		backButton.setOnAction(this);
-		
-		VBox instructorHomeRoot = new VBox(20);
-		
-		instructorHomeRoot.getChildren().addAll(instructorLogout, backButton);
-
-		Scene instructorHomeScene = new Scene(instructorHomeRoot, windowX, windowY);
-		return instructorHomeScene;
-	}
-	
 	
 	public Scene studentHomePage() {
 		
-		studentLogout = new Button();
-		studentLogout.setText("Student");
-		studentLogout.setOnAction(this);
-		
-		backButton = new Button();
-		backButton.setText("Back");	
-		backButton.setOnAction(this);
+		logout = new Button();
+		logout.setText("Logout");
+		logout.setOnAction(this);
+
+
 		
 		VBox studentHomeRoot = new VBox(20);
 		
@@ -812,19 +741,15 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 	
-	/**
-	 * Handle button press
-	 * Not used?
-	 * 
-	 */
+	/* NEVER USED
+	 
 	private void handleButtonPress() { //Triggered when someone presses the button
 		if(helloApp != null) {
 			helloApp.onButtonPressed(); //Calls a function in HelloApplication
 		}
 	}	
+	*/
 	
-
-
 	/**
 	 * Handle button
 	 */
@@ -872,12 +797,12 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 		// Register Handling (Submitting Invitation Code)
 		else if (event.getSource() == register) {
-            String code = enterCode.getText();
-			enterCode.clear();
-			
-		//	switchScene(create_account(code));
-
-            helloApp.handleInviteCodeAttempt(code); 
+           
+			String code = enterCode.getText();
+            enterCode.clear();
+            // Check that code exists
+            
+            helloApp.handleInviteCodeAttempt(code);
 		}
 
 		// Finish Set Up Handling 
@@ -983,31 +908,18 @@ public class GUIController implements EventHandler<ActionEvent>{
 			boolean instructorSelected = selInstructor.isSelected();
 			boolean studentSelected = selStudent.isSelected();
 			codeAlert = new Alert(AlertType.INFORMATION);
-			/*
-			if (adminSelected) {
-				// Add admin role
+			List<Integer> roles = new ArrayList<>();
+			if(adminSelected) {
+				roles.add(1);
 			}
-			if (instructorSelected) {
-				// Add instructor role
+			if(instructorSelected) {
+				roles.add(2);
 			}
-			if (studentSelected) {
-				// Add student role
+			if(studentSelected) {
+				roles.add(3);
 			}
-			else {
-				// Error, no roles selected
-				// Perhaps if none selected, automatically make student
-				codeAlert.setTitle("Error");
-				codeAlert.setContentText("Select at least one role!");
-			}
-			// If no error
-			
-			
-			// Just testing to get alert to work 
-			*/
-			
-			
-			// Need to fix this stuff 
-			switchScene(adminHomePage());
+			int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
+			String code = helloApp.createInviteCode(roleArr);
 			
 			codeAlert.setTitle("Invitation Code!");
 			codeAlert.setContentText("The invitation code is: "+code);
@@ -1082,23 +994,76 @@ public class GUIController implements EventHandler<ActionEvent>{
 		}
 		else if (event.getSource() == addRoleToUser) {
 			switchScene(addRoleToUser());
+		} else if (event.getSource() == addRole) {
+			String username = enterUserID.getText();
+			boolean adminSelected = addAdmin.isSelected();
+			boolean instructorSelected = addInstructor.isSelected();
+			boolean studentSelected = addStudent.isSelected();
+			Integer id = helloApp.getUsernameId(username);
+			if(id != null) {
+				enterUserID.clear();
+				List<Integer> roles = new ArrayList<>();
+				if(adminSelected) {
+					roles.add(1);
+				}
+				if(instructorSelected) {
+					roles.add(2);
+				}
+				if(studentSelected) {
+					roles.add(3);
+				}
+				int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
+				helloApp.addRoles(id, roleArr);
+				showAlert("Roles added");
+				switchScene(adminHomePage());
+			} else {
+				showAlert("No user found with that username");
+			}
+			
 		}
+		
 		else if (event.getSource() == removeRoleFromUser) {
 			switchScene(removeRoleFromUser());
 		}
+
+		else if (event.getSource() == removeRole) {
+			String username = enterUserID.getText();
+			boolean adminSelected = removeAdmin.isSelected();
+			boolean instructorSelected = removeInstructor.isSelected();
+			boolean studentSelected = removeStudent.isSelected();
+			Integer id = helloApp.getUsernameId(username);
+			if(id != null) {
+				enterUserID.clear();
+				List<Integer> roles = new ArrayList<>();
+				if(adminSelected) {
+					roles.add(1);
+				}
+				if(instructorSelected) {
+					roles.add(2);
+				}
+				if(studentSelected) {
+					roles.add(3);
+				}
+				int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
+				helloApp.removeRoles(id, roleArr);
+				showAlert("Roles removed");
+				switchScene(adminHomePage());
+			} else {
+				showAlert("No user found with that username");
+			}
+		}
+		
 		
 		else if (event.getSource() == backButton) {
 			switchScene(adminHomePage());
 		}
-		
-		
+		else if (event.getSource() == logout) {
+			helloApp.logoutCurrentUser();
+			switchScene(login_page());
+		}
 		
 	}
 	
-	
-
-
-
 	public void showAlert(String message) {
 	    // Create an Alert dialog
 	    Alert alert = new Alert(AlertType.INFORMATION);
@@ -1172,4 +1137,3 @@ public class GUIController implements EventHandler<ActionEvent>{
 	
 	
 }
-
