@@ -22,8 +22,12 @@ public class Name {
     }
 
     public String fullName() {
+        if (this.middle != "")
         return this.first + " " +
             this.middle + " " +
+            this.last;
+
+        return this.first + " " +
             this.last;
     }
 
@@ -88,6 +92,8 @@ public class Name {
             //should not both be true at the same time, cannot check that which does not exist
             //nor should be hung up on checking something that doesn't exist
 
+            //System.out.println(this.checkedP);
+            //System.out.println(this.hasPreferred);
             if (pref && checkedF && checkedM && checkedL) {
                 return this.names;
             }
@@ -156,7 +162,7 @@ public class Name {
                     break;
                 case Position.PREFERRED:
                     if (this.hasPreferred && v) this.checkedP = v;
-                    this.checkedP = false;
+                    else this.checkedP = false;
 
             }
         }

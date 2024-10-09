@@ -86,6 +86,24 @@ public class Tester {
        result = result && (nr.checkNV(Name.NameResult.Position.MIDDLE) == Name.NameResult.Status.SUCCESS);
        result = result && (nr.checkNV(Name.NameResult.Position.LAST) == Name.NameResult.Status.SUCCESS);
        result = result && (nr.checkNV(Name.NameResult.Position.PREFERRED) == Name.NameResult.Status.SUCCESS);
+       Name n = nr.getName();
+       //System.out.println("pre null");
+       if (n == null) return false;
+       //System.out.println("post null");
+       result = result && n.fullName().equals("first middle last");
+       return result;
+    }
+
+    private static boolean tN2_VWithOutMid() {
+       final Name.NameResult nr = Name.hasPreferred("first", "", "last", "pref");
+       boolean result = nr.checkNV(Name.NameResult.Position.FIRST) == Name.NameResult.Status.SUCCESS;
+       result = result && (nr.checkNV(Name.NameResult.Position.MIDDLE) == Name.NameResult.Status.EMPTY);
+       result = result && (nr.checkNV(Name.NameResult.Position.LAST) == Name.NameResult.Status.SUCCESS);
+       result = result && (nr.checkNV(Name.NameResult.Position.PREFERRED) == Name.NameResult.Status.SUCCESS);
+       Name n = nr.getName();
+       if (n == null) return false;
+       result = result && n.fullName().equals("first last");
+
        return result;
     }
 }
