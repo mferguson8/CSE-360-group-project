@@ -1,7 +1,9 @@
 package com.example.studenthelpapp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 // Some of these unnecessary so far 
 //import javafx.application.Application;
@@ -27,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 
 // (for self)
@@ -164,7 +167,8 @@ public class GUIController implements EventHandler<ActionEvent>{
     public void initialize(Stage mainStage, HelloApplication helloApp) {
     	this.mainStage = mainStage;
 		this.helloApp = helloApp;
-		switchScene(login_page()); // Placeholder 
+		//switchScene(login_page()); // Placeholder 
+		switchScene(adminHomePage()); //TODO FOR TEST. MUST REMOVE
     }
     
     /**
@@ -447,12 +451,12 @@ public class GUIController implements EventHandler<ActionEvent>{
 	public static class User {
 		private String username;
 		private String firstName;
-		private int code;
+		private String codes;
 		
-		public User(String username, String firstName, int code) {
+		public User(String username, String firstName, String codes) {
 			this.username = username;
 			this.firstName = firstName;
-			this.code = code;
+			this.codes = codes;
 		}
 		
 		public String getUsername() {
@@ -463,8 +467,9 @@ public class GUIController implements EventHandler<ActionEvent>{
 			return firstName;
 		}
 		
-		public int getCode() {
-			return code;
+		public String getCodes() {
+			return codes;
+			
 		}
 		
 	}
@@ -477,32 +482,40 @@ public class GUIController implements EventHandler<ActionEvent>{
 	public Scene listUsers(/*List<User> users*/) { // If using the TESTING getItems, take away parameter
 		// users from Users class 
 		TableView<User> userTable = new TableView<>();
-		
-		// userTable.getItems().addAll(users);
+		List<User> users = new ArrayList<>();
+		String userString = helloApp.listUsers();
+		String[] rows = userString.split("\n");
+		for(String row: rows) {
+			if(row.trim().isEmpty())
+			{
+				continue;
+			}
+			String[] parts = row.split(",",3);
+			String username = parts[0].trim();
+			String name = parts[1].trim();
+			String codes = parts[2].trim();
+			users.add(new User(username, name, codes));
+		}
 		
 		// TESTING, long list to test scrolling works properly, will be deleted
-		userTable.getItems().addAll(new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5), new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5), new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5), new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5), new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5), new User("User_A", "Name_A", 1),
-				new User("User_B", "Name_B", 2), new User("User_C", "Name_C", 3),
-				new User("User_D", "Name_D", 4), new User("User_E", "Name_E", 5));
-		///////////////
+		/*userTable.getItems().addAll(new User("User_A", "Name_A", "[1,2]"),
+				new User("User_B", "Name_B", "[1,2]"), new User("User_C", "Name_C", "[1,2]"),
+				new User("User_D", "Name_D", "[1,2]"), new User("User_E", "Name_E", "[1,2]"), new User("User_A", "Name_A", "[1,2]"),
+				new User("User_B", "Name_B", "[1,2]"), new User("User_C", "Name_C", "[1,2]"),
+				new User("User_D", "Name_D", "[1,2]"), new User("User_E", "Name_E", "[1,2]"), new User("User_A", "Name_A", "[1,2]"),
+				new User("User_B", "Name_B", "[1,2]"), new User("User_C", "Name_C", "[1,2]"));
+		*/
+				///////////////
+		
+		userTable.getItems().addAll(users);
 		
 		TableColumn<User, String> usernameColumn = new TableColumn<>("Username");
 		TableColumn<User, String> nameColumn = new TableColumn<>("First Name");
-		TableColumn<User, Integer> codeColumn = new TableColumn<>("Role Code");
+		TableColumn<User, String> codeColumn = new TableColumn<>("Role Codes");
 		
 		usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
 		nameColumn.setCellValueFactory(new PropertyValueFactory<>("firstName"));
-		codeColumn.setCellValueFactory(new PropertyValueFactory<>("code"));
+		codeColumn.setCellValueFactory(new PropertyValueFactory<>("codes"));
 		
 		@SuppressWarnings("unchecked")
 		TableColumn<User, ?>[] columns = new TableColumn[] {usernameColumn, nameColumn, codeColumn};
@@ -529,7 +542,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	public Scene resetUserPass() { 
 		
 		enterUserID = new TextField();
-		enterUserID.setPromptText("Enter user to password reset: ");
+		enterUserID.setPromptText("Enter Username for user to password reset: ");
 		
 		resetPass = new Button();
 		resetPass.setText("Reset");
@@ -564,14 +577,12 @@ public class GUIController implements EventHandler<ActionEvent>{
 		setPass.setText("Change Password");
 		setPass.setOnAction(this);
 		
-		backButton = new Button();
-		backButton.setText("Back");	
-		backButton.setOnAction(this);
-		
+		//Removed back button from this, as it is a forced password reset.
+		//If we want a user initiated password reset, we can make a new scene.
 		
 		VBox changePassRoot = new VBox(20);
 		
-		changePassRoot.getChildren().addAll(newPass, confirmNewPass, setPass, backButton);
+		changePassRoot.getChildren().addAll(newPass, confirmNewPass, setPass);
 		
 		Scene changePassScene = new Scene(changePassRoot, windowX, windowY);
 		return changePassScene;
@@ -580,11 +591,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 	public Scene deleteUser() {
 
 		enterUserID = new TextField();
-		enterUserID.setPromptText("Enter the user id");
+		enterUserID.setPromptText("Enter the Username of the user to delete");
 		
-		deleteUser = new Button();
-		deleteUser.setText("Delete");
-		deleteUser.setOnAction(this);
+		deleteUserButton = new Button();
+		deleteUserButton.setText("Delete");
+		deleteUserButton.setOnAction(this);
 		
 		backButton = new Button();
 		backButton.setText("Back");	
@@ -592,7 +603,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 		VBox deleteUserRoot = new VBox(20);
 
-		deleteUserRoot.getChildren().addAll(enterUserID, deleteUser, backButton);
+		deleteUserRoot.getChildren().addAll(enterUserID, deleteUserButton, backButton);
 
 		Scene deleteUserScene = new Scene(deleteUserRoot, windowX, windowY);
 		return deleteUserScene;
@@ -602,7 +613,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	public Scene addRoleToUser() {
 
 		enterUserID = new TextField();
-		enterUserID.setPromptText("Enter the user (ID/name)");
+		enterUserID.setPromptText("Enter the Username");
 
 		addAdmin = new CheckBox();
 		addAdmin.setText("Admin");
@@ -632,7 +643,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	public Scene removeRoleFromUser() {
 
 		enterUserID = new TextField();
-		enterUserID.setPromptText("Enter the user (ID/name)");
+		enterUserID.setPromptText("Enter the Username");
 
 		removeAdmin = new CheckBox();
 		removeAdmin.setText("Admin");
@@ -662,19 +673,17 @@ public class GUIController implements EventHandler<ActionEvent>{
 	public Scene instructorHomePage() {
 		
 		instructorLogout = new Button();
-		instructorLogout.setText("Instructor");
+		//instructorLogout.setText("Instructor");
 		instructorLogout.setOnAction(this);
 		
-		backButton = new Button();
-		backButton.setText("Back");	
-		backButton.setOnAction(this);
+		//Removed back button from this. We don't want no back button on home pages.
 
 		instructorLogout.setText("Logout");
 
 		
 		VBox instructorHomeRoot = new VBox(20);
 		
-		instructorHomeRoot.getChildren().addAll(instructorLogout, backButton);
+		instructorHomeRoot.getChildren().addAll(instructorLogout);
 
 		Scene instructorHomeScene = new Scene(instructorHomeRoot, windowX, windowY);
 		return instructorHomeScene;
@@ -684,18 +693,14 @@ public class GUIController implements EventHandler<ActionEvent>{
 	public Scene studentHomePage() {
 		
 		studentLogout = new Button();
-		studentLogout.setText("Student");
+		//studentLogout.setText("Student");
 		studentLogout.setOnAction(this);
-		
-		backButton = new Button();
-		backButton.setText("Back");	
-		backButton.setOnAction(this);
 		studentLogout.setText("Logout");
 
 		
 		VBox studentHomeRoot = new VBox(20);
 		
-		studentHomeRoot.getChildren().addAll(studentLogout, backButton);
+		studentHomeRoot.getChildren().addAll(studentLogout);
 
 		Scene studentHomeScene = new Scene(studentHomeRoot, windowX, windowY);
 		return studentHomeScene;
@@ -830,86 +835,167 @@ public class GUIController implements EventHandler<ActionEvent>{
 			boolean instructorSelected = selInstructor.isSelected();
 			boolean studentSelected = selStudent.isSelected();
 			codeAlert = new Alert(AlertType.INFORMATION);
-			/*
-			if (adminSelected) {
-				// Add admin role
+			List<Integer> roles = new ArrayList<>();
+			if(adminSelected) {
+				roles.add(1);
 			}
-			if (instructorSelected) {
-				// Add instructor role
+			if(instructorSelected) {
+				roles.add(2);
 			}
-			if (studentSelected) {
-				// Add student role
+			if(studentSelected) {
+				roles.add(3);
 			}
-			else {
-				// Error, no roles selected
-				// Perhaps if none selected, automatically make student
-				codeAlert.setTitle("Error");
-				codeAlert.setContentText("Select at least one role!");
-			}
-			// If no error
-			
-			
-			// Just testing to get alert to work 
-			*/
-			
-			
-			// Need to fix this stuff 
-			switchScene(adminHomePage());
+			int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
+			String code = helloApp.createInviteCode(roleArr);
 			
 			codeAlert.setTitle("Invitation Code!");
-			codeAlert.setContentText("Code");
+			codeAlert.setContentText("The invitation code is: "+code);
 			
 			codeAlert.showAndWait();
-
+			// Need to fix this stuff
+			switchScene(adminHomePage());
 		}
 		
 		
 		else if (event.getSource() == resetPass) {
-			// check username exists?
-			//int userID = enterUserID.();
-			//helloApp.adminResetPassword(userID);
+			String username = enterUserID.getText();
+			Integer id = helloApp.getUsernameId(username);
+			if(id != null) {
+				enterUserID.clear();
+				helloApp.adminResetPassword(id);
+				switchScene(adminHomePage());
+			} else {
+				showAlert("User with that Username not found");
+			}
 		}
 
 		else if (event.getSource() == setPass) {
 			// Check if passwords match
 			String newPassword = newPass.getText();
-		//	helloApp.resetUserPassword(newPassword);
-			switchScene(changePass());
+			String copyPassword = confirmNewPass.getText();
+			if(newPassword.equals(copyPassword))
+			{
+				newPass.clear();
+				confirmNewPass.clear();
+				helloApp.resetUserPassword(newPassword);
+			} else {
+				
+				showAlert("Passwords do not match");
+				
+			}
 		}
 		
 		else if (event.getSource() == resetUser) {
+			//Button on the admin home page that takes you to the password reset scene
 			switchScene(resetUserPass());
 		}
 
 		else if (event.getSource() == deleteUser) {
-			// String userToDelete = enterUserID.getText();
-
-			// I'll fix alert
-			//sure.setTitle("Are you sure?");
-			//sure.setContentText("This will be permanent. Are you sure you want to delete user " + userToDelete + "?");
-			//sure.showAndWait();
-			// Are you sure alert
-			// If yes, delete
-			// If no, 
+			//Button on the admin home page that takes you to the delete user scene
 			switchScene(deleteUser());
+		}
+		else if (event.getSource() == deleteUserButton) {
+			String userToDelete = enterUserID.getText();
+			Integer id = helloApp.getUsernameId(userToDelete);
+			if(id != null) {
+				sure = new Alert(AlertType.CONFIRMATION);
+				sure.setTitle("Are you sure?");
+				sure.setContentText("This will be permanent. Are you sure you want to delete user " + userToDelete + "?");
+				ButtonType yesButton = new ButtonType("Yes");
+				ButtonType noButton = new ButtonType("No");
+				sure.getButtonTypes().setAll(yesButton, noButton);
+				Optional<ButtonType> result = sure.showAndWait();
+				if(result.isPresent() && (result.get() == yesButton)) {
+					enterUserID.clear();
+					helloApp.deleteUser(id);
+				} else if(result.isPresent() && (result.get() == noButton)) {
+					enterUserID.clear();
+				}
+			} else {
+				showAlert("No user found with that username");
+			}
 		}
 		
 		else if (event.getSource() == listUsers) {
 			switchScene(listUsers());
 		}
 		else if (event.getSource() == addRoleToUser) {
-			// String userID = enterUserID.getText();
-			// add
 			switchScene(addRoleToUser());
+		} else if (event.getSource() == addRole) {
+			String username = enterUserID.getText();
+			boolean adminSelected = addAdmin.isSelected();
+			boolean instructorSelected = addInstructor.isSelected();
+			boolean studentSelected = addStudent.isSelected();
+			Integer id = helloApp.getUsernameId(username);
+			if(id != null) {
+				enterUserID.clear();
+				List<Integer> roles = new ArrayList<>();
+				if(adminSelected) {
+					roles.add(1);
+				}
+				if(instructorSelected) {
+					roles.add(2);
+				}
+				if(studentSelected) {
+					roles.add(3);
+				}
+				int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
+				helloApp.addRoles(id, roleArr);
+				showAlert("Roles added");
+				switchScene(adminHomePage());
+			} else {
+				showAlert("No user found with that username");
+			}
+			
 		}
+		
 		else if (event.getSource() == removeRoleFromUser) {
-			// String userID = enterUserID.getText();
 			switchScene(removeRoleFromUser());
 		}
+		else if (event.getSource() == removeRole) {
+			String username = enterUserID.getText();
+			boolean adminSelected = removeAdmin.isSelected();
+			boolean instructorSelected = removeInstructor.isSelected();
+			boolean studentSelected = removeStudent.isSelected();
+			Integer id = helloApp.getUsernameId(username);
+			if(id != null) {
+				enterUserID.clear();
+				List<Integer> roles = new ArrayList<>();
+				if(adminSelected) {
+					roles.add(1);
+				}
+				if(instructorSelected) {
+					roles.add(2);
+				}
+				if(studentSelected) {
+					roles.add(3);
+				}
+				int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
+				helloApp.removeRoles(id, roleArr);
+				showAlert("Roles removed");
+				switchScene(adminHomePage());
+			} else {
+				showAlert("No user found with that username");
+			}
+		}
+		
 		
 		else if (event.getSource() == backButton) {
 			switchScene(adminHomePage());
 		}
+		else if (event.getSource() == adminLogout) {
+			helloApp.logoutCurrentUser();
+			switchScene(login_page());
+		}
+		else if (event.getSource() == instructorLogout) {
+			helloApp.logoutCurrentUser();
+			switchScene(login_page());
+		}
+		else if (event.getSource() == studentLogout) {
+			helloApp.logoutCurrentUser();
+			switchScene(login_page());
+		}
+		
 		
 		
 		

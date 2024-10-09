@@ -1,7 +1,11 @@
 package com.example.studenthelpapp;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -49,7 +53,8 @@ class DatabaseController {
 		}
 		
 		
-		public void wipeDatabase() {
+		public void wipeDatabase() {	
+			//TODO: THIS IS ONLY FOR TESTING. REMOVE
 		    String sql = "DROP ALL OBJECTS";
 		    try (Statement stmt = connection.createStatement()) {
 		        stmt.execute(sql);
@@ -59,6 +64,74 @@ class DatabaseController {
 		    }
 		}
 
+		public void fakePeople() {
+		    // Define sample names for generating semi-realistic users
+		    String[] firstNames = {"John", "Jane", "Michael", "Emily", "David", "Emma", "Chris", "Sophia", "Daniel", "Olivia"};
+		    String[] lastNames = {"Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor"};
+		    
+		    // Random number generator for assigning roles
+		    Random random = new Random();
+
+		    try {
+		        // SQL query to insert users
+		        String insertUserSQL = "INSERT INTO USERS (username, email, hashed_password, first_name, middle_name, last_name, password_salt) "
+		                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+		        // SQL query to assign roles to users
+		        String insertUserRoleSQL = "INSERT INTO USERROLES (user_id, role_id) VALUES (?, ?)";
+
+		        PreparedStatement insertUserStmt = connection.prepareStatement(insertUserSQL, Statement.RETURN_GENERATED_KEYS);
+		        PreparedStatement insertUserRoleStmt = connection.prepareStatement(insertUserRoleSQL);
+
+		        // Insert 20 fake users
+		        for (int i = 1; i <= 20; i++) {
+		            String firstName = firstNames[random.nextInt(firstNames.length)];
+		            String lastName = lastNames[random.nextInt(lastNames.length)];
+		            String username = firstName.toLowerCase() + i;
+		            String email = username + "@example.com";
+		            String hashedPassword = "password" + i; // Plaintext passwords for testing
+		            String passwordSalt = "salt" + i; // Plaintext salt for testing
+
+		            // Insert the user into the USERS table
+		            insertUserStmt.setString(1, username);
+		            insertUserStmt.setString(2, email);
+		            insertUserStmt.setString(3, hashedPassword);
+		            insertUserStmt.setString(4, firstName);
+		            insertUserStmt.setNull(5, java.sql.Types.VARCHAR); // Null for middle_name
+		            insertUserStmt.setString(6, lastName);
+		            insertUserStmt.setString(7, passwordSalt);
+		            insertUserStmt.executeUpdate();
+
+		            // Retrieve the generated user ID
+		            ResultSet generatedKeys = insertUserStmt.getGeneratedKeys();
+		            if (generatedKeys.next()) {
+		                int userId = generatedKeys.getInt(1);
+
+		                // Randomly assign roles to users
+		                int numRoles = random.nextInt(3) + 1; // Each user gets between 1 to 3 roles
+		                Set<Integer> assignedRoles = new HashSet<>();
+		                for (int j = 0; j < numRoles; j++) {
+		                    int roleId;
+		                    do {
+		                    	roleId= random.nextInt(3) + 1; // Role ID between 1 (Admin) and 3 (Student)
+		                    } while(assignedRoles.contains(roleId));
+		                    assignedRoles.add(roleId);
+		                    insertUserRoleStmt.setInt(1, userId);
+		                    insertUserRoleStmt.setInt(2, roleId);
+		                    insertUserRoleStmt.executeUpdate();
+		                }
+		            }
+		        }
+
+		        insertUserStmt.close();
+		        insertUserRoleStmt.close();
+
+		        System.out.println("Inserted 20 fake users with random roles into the database.");
+
+		    } catch (SQLException e) {
+		        e.printStackTrace();
+		    }
+		}
 		
 		private void createTables() throws SQLException {
 			//Creates these tables if they don't exist
@@ -124,6 +197,7 @@ class DatabaseController {
 				statement.execute(topicsTable);
 				statement.execute(comfortLevelsTable);
 				statement.execute(userTopicComfortJunctionTable);
+				statement.execute(accessCodeRoles);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -160,8 +234,8 @@ class DatabaseController {
 			}
 			
 			
-			
-			
+			System.out.println("All tables created");
+			fakePeople(); //TODO THIS IS FOR TESTING, REMOVE
 			
 			//TODO Here
 			//Populate topicsTable and ComfortLevelsTable 
@@ -301,7 +375,7 @@ class DatabaseController {
 		}
 		
 		public boolean addRoleToUser(int userID, int roleID) {
-			String addRole = "INSERT INTO USERROLES (user_id, role_id) VALUES (?, ?)";
+			String addRole = "MERGE INTO USERROLES (user_id, role_id) KEY (user_id, role_id) VALUES (?, ?)";
 			try (PreparedStatement pstmt = connection.prepareStatement(addRole)) {
 				pstmt.setInt(1,userID);
 				pstmt.setInt(2,roleID);
@@ -547,6 +621,32 @@ class DatabaseController {
 				e.printStackTrace();
 			}
 			return -1;
+			
+		}
+		
+		
+		public String listUsers() {
+			StringBuilder userList = new StringBuilder();
+			
+			String getUsers = "SELECT id, username, first_name, last_name FROM USERS";
+			
+			try (PreparedStatement pstmt = connection.prepareStatement(getUsers)) {
+				try(ResultSet rs = pstmt.executeQuery()) {
+					while(rs.next()) {
+						userList.append(rs.getString("username") + ", " + rs.getString("first_name") + " " + rs.getString("last_name")+", ");
+						int id = rs.getInt("id");
+						int[] roles = getUsersRoleIds(id);
+						userList.append(Arrays.toString(roles) + "\n");
+					}
+					return userList.toString();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return "Error, fetching, users";
 			
 		}
 		

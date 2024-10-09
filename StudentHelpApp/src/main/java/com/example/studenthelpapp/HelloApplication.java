@@ -23,8 +23,7 @@ public class HelloApplication extends Application {
 
 
     public void start(@SuppressWarnings("exports") Stage primaryStage) {
-    	System.out.println("ASU Hello World!");
-    	System.out.println("It started!");
+ 
         gui = new GUIController();
         gui.initialize(primaryStage, this);
 
@@ -102,8 +101,8 @@ public class HelloApplication extends Application {
     			//Check if they need to reset their password
     			int passwordResetCheck = database.checkIfPasswordResetRequired(userID);
     			if(passwordResetCheck == 1) {
-    				//TODO: Here make sure we switch to the scene to reset their password. Have it call the resetUserPassword function here
-    				//and then log them out.
+    				gui.switchScene(gui.changePass());
+    				return;
     			} else if(passwordResetCheck == 2) {
     				gui.showAlert("Temporary password has expired. Please contact an admin.");
     				gui.switchScene(gui.login_page());
@@ -122,6 +121,10 @@ public class HelloApplication extends Application {
     			directToHomePageOrSelectRole(userID);
     		}
     	}
+    }
+    
+    public void logoutCurrentUser() {
+    	loggedInUserID = -1;
     }
     
     public void directToHomePageOrSelectRole(int userID) {
@@ -191,28 +194,6 @@ public class HelloApplication extends Application {
     	return inviteCode;
     }
     
-    //public void onButtonPressed() { //Called by GUIController when someone presses the button
-    //	i++;
-    //	gui.setTitle(String.valueOf(i));
-    //	System.out.println("Button Pressed!");
-    //}
-    
-    //public static String hashString(String input) {
-    //	try {
-	//    	MessageDigest digester = MessageDigest.getInstance("SHA-256");
-	//    	byte[] hashedBytes = digester.digest(input.getBytes());
-	//
-	//    	String hexString = "";
-	//    	for(byte b: hashedBytes) {
-	//    		hexString += String.format("%02x",b);
-	//    	}
-	//        return hexString;
-	//
-    //	} catch(NoSuchAlgorithmException e) {
-    //    	e.printStackTrace();
-    //    	return null;
-    //    }
-    //}
     
     
     public void adminResetPassword(int user_id) {
@@ -221,6 +202,10 @@ public class HelloApplication extends Application {
     	String newHashedPassword = hashString(newPassword + password_salt);
     	database.adminResetPassword(user_id, newHashedPassword); //Check here for problems? Handle errors from false output.
     	gui.showAlert("The user's new password is: " + newPassword);
+    }
+    
+    public Integer getUsernameId(String username) {
+    	return database.getUserIdByUsername(username);
     }
     
     public void resetUserPassword(String newPassword) {
@@ -243,6 +228,41 @@ public class HelloApplication extends Application {
     		gui.switchScene(gui.login_page());
     		loggedInUserID = -1;
     	}
+    }
+    
+    public void deleteUser(int user_id) {
+    	int[] empty = {};
+    	database.changeUserRoles(user_id, empty);
+    	boolean outcome = database.deleteUser(user_id);
+    	if(!outcome) {
+    		System.err.println("Failed to delete user with id: " + user_id);
+    	}
+    }
+    
+    public void addRoles(int user_id, int[] roles) {
+    	boolean outcome;
+    	for(int i : roles) {
+    		outcome = database.addRoleToUser(user_id, i);
+    		if(!outcome) {
+    			System.err.println("Error adding role " + i + " to userId: " + user_id);
+    		}
+    	}
+    	//TODO: Deal with potential problems.
+    }
+    
+    public void removeRoles(int user_id, int[] roles) {
+    	boolean outcome;
+    	for(int i : roles) {
+    		outcome = database.deleteRoleFromUser(user_id, i);
+    		if(!outcome) {
+    			System.err.println("Error deleting role " + i + " from userId: " + user_id);
+    		}
+    	}
+    	//TODO: Deal with potential problems.
+    }
+    
+    public String listUsers() {
+    	return database.listUsers();
     }
  
 }
