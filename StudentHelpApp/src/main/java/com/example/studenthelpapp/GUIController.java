@@ -5,22 +5,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-
-// Some of these unnecessary so far 
-//import javafx.application.Application;
+import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-//import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-//import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
-//import javafx.scene.text.Text;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
