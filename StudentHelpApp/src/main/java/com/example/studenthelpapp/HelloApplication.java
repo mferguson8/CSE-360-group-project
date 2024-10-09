@@ -17,6 +17,7 @@ public class HelloApplication extends Application {
 	private int loggedInUserID;
 	private GUIController gui;
 	private DatabaseController database;
+	private RngStrGen codeGenerator;
     public static void main(String[] args) {
         launch(args);
     }
@@ -30,7 +31,7 @@ public class HelloApplication extends Application {
     	database = new DatabaseController();
     	database.connectToDatabase();
         	
-     
+    	codeGenerator = new RngStrGen(true, true, true);
     }
     
     public void onButtonPressed() { //Called by GUIController when someone presses the button
@@ -62,11 +63,8 @@ public class HelloApplication extends Application {
     	{
     		//If the database is empty then they are the first user, and the admin.
     		
-    		String passwordSalt = ""; //TODO: Create PasswordSalt
+    		String passwordSalt = codeGenerator.generate(20);
     		String hashedPassword = hashString(password + passwordSalt);
-    		System.out.println("Username: " + username);//TODO: REMOVE, JUST FOR TESTING
-    		System.out.println("User password: " + password);//TODO: REMOVE, JUST FOR TESTING
-    		System.out.println("User hashed password: " + hashedPassword);//TODO: REMOVE, JUST FOR TESTING
     		database.createUser(username, hashedPassword, passwordSalt);
     		Integer userID = database.getUserIdByUsername(username);
     		if(userID == null) {
@@ -85,11 +83,7 @@ public class HelloApplication extends Application {
     			return;
     		}
     		String passwordSalt = database.getSaltById(userID);
-    		System.out.println("Username: " + username);//TODO: REMOVE, JUST FOR TESTING
-    		System.out.println("User password: " + password);//TODO: REMOVE, JUST FOR TESTING
-    		System.out.println("User salt: " + passwordSalt);//TODO: REMOVE, JUST FOR TESTING
     		String hashedPassword = hashString(password + passwordSalt);
-    		System.out.println("User hashed password: " + hashedPassword);//TODO: REMOVE, JUST FOR TESTING
     		boolean loginAttempt = database.loginAttempt(userID, username, hashedPassword);
     		if(!loginAttempt) {
     			gui.showAlert("Wrong Username or Password");
@@ -160,10 +154,13 @@ public class HelloApplication extends Application {
     	//For creating a user when they join using an invite code.
     	//Designed to be called by the create account button handling.
     	
-    	//TODO: Before finally creating the account, check that the invite code is still valid?
+    	//Double checking that invite_code is valid
+    	if(!database.checkIfInviteCodeValid(invite_code)) {
+    		gui.showAlert("Sorry, that invite code isn't valid anymore. There might have been an error");
+    		gui.switchScene(gui.login_page());
+    	}
     	
-    	//Generate Password Salt
-    	String password_salt = ""; //TODO: Implement salt generation
+    	String password_salt = codeGenerator.generate(20);
     	String hashed_password = hashString(password + password_salt);
     	database.createUser(username, hashed_password, password_salt); //Boolean to test if it works?
     	int user_id = database.getUserIdByUsername(username); //A little clunky
@@ -186,7 +183,7 @@ public class HelloApplication extends Application {
     }
     
     public String createInviteCode(int[] roles) {
-    	String inviteCode = "1"; //TODO: Generate Invite Code
+    	String inviteCode = codeGenerator.generate(12); 
     	for(int i: roles) {
     		database.addInviteCodeRole(inviteCode, i);
     		//TODO: Check here for problems?
@@ -197,7 +194,7 @@ public class HelloApplication extends Application {
     
     
     public void adminResetPassword(int user_id) {
-    	String newPassword = "test123"; //TODO: Generate new randomized password
+    	String newPassword = codeGenerator.generate(12); 
     	String password_salt = database.getSaltById(user_id);
     	String newHashedPassword = hashString(newPassword + password_salt);
     	database.adminResetPassword(user_id, newHashedPassword); //Check here for problems? Handle errors from false output.

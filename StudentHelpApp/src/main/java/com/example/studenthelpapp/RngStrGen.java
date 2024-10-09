@@ -1,6 +1,7 @@
 package com.example.studenthelpapp;
 
-import java.util.Random;
+import java.security.SecureRandom;
+import java.nio.ByteBuffer;
 public class RngStrGen {// random string generation
     //for salt and otp generation
 
@@ -42,7 +43,7 @@ public class RngStrGen {// random string generation
 
     public String generate(int length) {
         StringBuilder neo = new StringBuilder("");
-        Random rng = new Random();
+        SecureRandom rng = new SecureRandom();
 
         for (int fv = 0; fv < length; fv++) {
             neo.append(bag[rng.nextInt(bag.length)]);
@@ -78,7 +79,8 @@ public class RngStrGen {// random string generation
             return this.generate(length);
         }
         StringBuilder neo = new StringBuilder("");
-        Random rng = new Random(StrToSeed(seed));
+        byte[] byte_seed = ByteBuffer.allocate(Long.BYTES).putLong(StrToSeed(seed)).array();
+        SecureRandom rng = new SecureRandom(byte_seed);
 
         for (int fv = 0; fv < length; fv++) {
             neo.append(bag[rng.nextInt(bag.length)]);
@@ -101,7 +103,8 @@ public class RngStrGen {// random string generation
         }
 
         StringBuilder neo = new StringBuilder("");
-        Random rng = new Random(seed);
+        byte[] byte_seed = ByteBuffer.allocate(Long.BYTES).putLong(seed).array();
+        SecureRandom rng = new SecureRandom(byte_seed);
 
         for (int fv = 0; fv < length; fv++) {
             neo.append(bag[rng.nextInt(bag.length)]);

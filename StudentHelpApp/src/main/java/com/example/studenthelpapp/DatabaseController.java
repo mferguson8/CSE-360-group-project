@@ -10,12 +10,7 @@ import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
-//TODO
 
-//Handle Adding/changing data about current users
-//Handle admin listing users (user_name, first middle and last name, roles)
-
-//Note: Use SecureRandom to generate salts, and try to make them at least 20 characters
 //In addition, switch from SHA256 to bcrypt, scrypt, or Argon2 for better security.
 
 //Don't store database login and password in code, and change them.
