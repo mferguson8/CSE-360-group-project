@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.studenthelpapp.DatabaseController.RoleCodes;
 
 // Some of these unnecessary so far 
 //import javafx.application.Application;
@@ -331,15 +332,15 @@ public class GUIController implements EventHandler<ActionEvent>{
 		List<Button> roleButtons = new ArrayList<>();
 		
 		for(int i: roles) {
-			if(i == 1) {
+			if(i == RoleCodes.ADMIN.get()) {
 				admin = new Button("Admin");
 				admin.setOnAction(this);
 				roleButtons.add(admin);
-			} else if (i == 2) {
+			} else if (i == RoleCodes.INSTRUCTOR.get()) {
 				instructor = new Button("Instructor");
 				instructor.setOnAction(this);
 				roleButtons.add(instructor);
-			} else if (i == 3) {
+			} else if (i == RoleCodes.STUDENT.get()) {
 				student = new Button("Student");
 				student.setOnAction(this);
 				roleButtons.add(student);
@@ -727,16 +728,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 	
-	/**
-	 * Handle button press
-	 * Not used?
-	 * 
-	 */
-	private void handleButtonPress() { //Triggered when someone presses the button
-		if(helloApp != null) {
-			helloApp.onButtonPressed(); //Calls a function in HelloApplication
-		}
-	}	
+	
 	
 	/**
 	 * Handle button
@@ -899,13 +891,13 @@ public class GUIController implements EventHandler<ActionEvent>{
 			codeAlert = new Alert(AlertType.INFORMATION);
 			List<Integer> roles = new ArrayList<>();
 			if(adminSelected) {
-				roles.add(1);
+				roles.add(RoleCodes.ADMIN.get());
 			}
 			if(instructorSelected) {
-				roles.add(2);
+				roles.add(RoleCodes.INSTRUCTOR.get());
 			}
 			if(studentSelected) {
-				roles.add(3);
+				roles.add(RoleCodes.STUDENT.get());
 			}
 			int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
 			String code = helloApp.createInviteCode(roleArr);
@@ -993,13 +985,13 @@ public class GUIController implements EventHandler<ActionEvent>{
 				enterUserID.clear();
 				List<Integer> roles = new ArrayList<>();
 				if(adminSelected) {
-					roles.add(1);
+					roles.add(RoleCodes.ADMIN.get());
 				}
 				if(instructorSelected) {
-					roles.add(2);
+					roles.add(RoleCodes.INSTRUCTOR.get());
 				}
 				if(studentSelected) {
-					roles.add(3);
+					roles.add(RoleCodes.STUDENT.get());
 				}
 				int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
 				helloApp.addRoles(id, roleArr);
@@ -1024,13 +1016,13 @@ public class GUIController implements EventHandler<ActionEvent>{
 				enterUserID.clear();
 				List<Integer> roles = new ArrayList<>();
 				if(adminSelected) {
-					roles.add(1);
+					roles.add(RoleCodes.ADMIN.get());
 				}
 				if(instructorSelected) {
-					roles.add(2);
+					roles.add(RoleCodes.INSTRUCTOR.get());
 				}
 				if(studentSelected) {
-					roles.add(3);
+					roles.add(RoleCodes.STUDENT.get());
 				}
 				int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
 				helloApp.removeRoles(id, roleArr);
@@ -1046,8 +1038,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 			switchScene(adminHomePage());
 		}
 		else if (event.getSource() == adminLogout) {
-			helloApp.logoutCurrentUser();
-			switchScene(login_page());
+			//helloApp.logoutCurrentUser();
+			//switchScene(login_page());
+			//TODO TESTING, FIX
+			showAlert("Test123");
 		}
 		else if (event.getSource() == instructorLogout) {
 			helloApp.logoutCurrentUser();

@@ -11,6 +11,8 @@ import javafx.stage.Stage;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import com.example.studenthelpapp.DatabaseController.RoleCodes;
+
 import java.io.IOException;
 
 public class HelloApplication extends Application {
@@ -34,10 +36,7 @@ public class HelloApplication extends Application {
     	codeGenerator = new RngStrGen(true, true, true);
     }
     
-    public void onButtonPressed() { //Called by GUIController when someone presses the button
-
-    	System.out.println("Button Pressed!");
-    }
+   
     
     public static String hashString(String input) {
     	try {
@@ -68,14 +67,15 @@ public class HelloApplication extends Application {
     		database.createUser(username, hashedPassword, passwordSalt);
     		Integer userID = database.getUserIdByUsername(username);
     		if(userID == null) {
-    			System.err.println("Error creating and fetching admin account");
+    			System.err.println("Error creating first admin user.");
     			return;
     		}
     		
-    		database.addRoleToUser(userID, 1); //1 is ID for admin
+    		database.addRoleToUser(userID, RoleCodes.ADMIN.get()); 
     		gui.showAlert("Welcome Admin. Please login again using the same information");
     		gui.switchScene(gui.login_page());
     	} else {
+    		
     		Integer userID = database.getUserIdByUsername(username);
     		if(userID == null) {
     			gui.showAlert("Wrong Username or Password");
@@ -128,13 +128,13 @@ public class HelloApplication extends Application {
 			System.err.println("User ID: " + Integer.toString(userID) +" does not have any roles");
 			return;
 		} else if( roles.length == 1) {
-			if(roles[0] == 1) {
+			if(roles[0] == RoleCodes.ADMIN.get()) {
 				gui.switchScene(gui.adminHomePage());
 				System.out.println("Directed to Admin Homepage");
-			} else if(roles[0] == 2) {
+			} else if(roles[0] == RoleCodes.INSTRUCTOR.get()) {
 				gui.switchScene(gui.instructorHomePage());
 				System.out.println("Directed to Instructor Homepage");
-			} else if(roles[0] == 3) {
+			} else if(roles[0] == RoleCodes.STUDENT.get()) {
 				gui.switchScene(gui.studentHomePage());
 				System.out.println("Directed to Student Homepage");
 			}
@@ -158,12 +158,18 @@ public class HelloApplication extends Application {
     	if(!database.checkIfInviteCodeValid(invite_code)) {
     		gui.showAlert("Sorry, that invite code isn't valid anymore. There might have been an error");
     		gui.switchScene(gui.login_page());
+    		return;
     	}
     	
     	String password_salt = codeGenerator.generate(20);
     	String hashed_password = hashString(password + password_salt);
     	database.createUser(username, hashed_password, password_salt); //Boolean to test if it works?
-    	int user_id = database.getUserIdByUsername(username); //A little clunky
+    	Integer user_id = database.getUserIdByUsername(username); //A little clunky
+    	if(user_id == null) {
+    		gui.showAlert("Error creating account. Please talk to an admin.");
+    		gui.switchScene(gui.login_page());
+    		return;
+    	}
     	int[] roles = database.getInviteCodeRoles(invite_code);
     	for(int i: roles) {
     		database.addRoleToUser(user_id, i); //Check for success or failure?

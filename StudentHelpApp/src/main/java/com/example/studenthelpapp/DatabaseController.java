@@ -10,24 +10,44 @@ import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
-
+//Notes:
+//Don't store database login and password in code, and change them.
 //In addition, switch from SHA256 to bcrypt, scrypt, or Argon2 for better security.
 
-//Don't store database login and password in code, and change them.
+
 
 class DatabaseController {
+		//DatabaseController is designed to handle all the logic for interacting with the database,
+		//and be simple to use.
+	
+	
 		// JDBC driver name and database URL 
-		static final String JDBC_DRIVER = "org.h2.Driver";   
-		static final String DB_URL = "jdbc:h2:~/firstDatabase";  
+		private static final String JDBC_DRIVER = "org.h2.Driver";   
+		private static final String DB_URL = "jdbc:h2:~/StudentHelpApp";  
 		
 		//The applications login credentials
-		static final String USER = "sa"; 
-		static final String PASS = ""; 
+		private static final String USER = "sa"; 
+		private static final String PASS = ""; 
 		
 		//Connection and Statement
 		private Connection connection = null;
 		private Statement statement = null; 
 		
+		public static enum RoleCodes {
+            ADMIN(1),
+            INSTRUCTOR(2), 
+            STUDENT(3);
+            
+            private final int roleId;
+			
+			RoleCodes(int roleId) {
+				this.roleId = roleId;
+			}
+			
+			public int get() {
+				return roleId;
+			}
+        }
 		
 		public void connectToDatabase() {
 			
@@ -36,7 +56,7 @@ class DatabaseController {
 				System.out.println("Connecting to database...");
 				connection = DriverManager.getConnection(DB_URL, USER, PASS);
 				statement = connection.createStatement(); 
-				wipeDatabase(); //TODO: This is for testing. Remove
+				//wipeDatabase(); //TODO: This is for testing. Remove
 				
 				createTables();  // Create the necessary tables if they don't exist
 				System.out.println("Connected to database!");
@@ -48,7 +68,7 @@ class DatabaseController {
 		}
 		
 		
-		public void wipeDatabase() {	
+		private void wipeDatabase() {	
 			//TODO: THIS IS ONLY FOR TESTING. REMOVE
 		    String sql = "DROP ALL OBJECTS";
 		    try (Statement stmt = connection.createStatement()) {
@@ -59,26 +79,26 @@ class DatabaseController {
 		    }
 		}
 
-		public void fakePeople() {
-		    // Define sample names for generating semi-realistic users
+		private void fakePeople() {
+		   
 		    String[] firstNames = {"John", "Jane", "Michael", "Emily", "David", "Emma", "Chris", "Sophia", "Daniel", "Olivia"};
 		    String[] lastNames = {"Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor"};
 		    
-		    // Random number generator for assigning roles
+		    
 		    Random random = new Random();
 
 		    try {
-		        // SQL query to insert users
+		        
 		        String insertUserSQL = "INSERT INTO USERS (username, email, hashed_password, first_name, middle_name, last_name, password_salt) "
 		                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-		        // SQL query to assign roles to users
+		       
 		        String insertUserRoleSQL = "INSERT INTO USERROLES (user_id, role_id) VALUES (?, ?)";
 
 		        PreparedStatement insertUserStmt = connection.prepareStatement(insertUserSQL, Statement.RETURN_GENERATED_KEYS);
 		        PreparedStatement insertUserRoleStmt = connection.prepareStatement(insertUserRoleSQL);
 
-		        // Insert 20 fake users
+		        
 		        for (int i = 1; i <= 20; i++) {
 		            String firstName = firstNames[random.nextInt(firstNames.length)];
 		            String lastName = lastNames[random.nextInt(lastNames.length)];
@@ -87,7 +107,7 @@ class DatabaseController {
 		            String hashedPassword = "password" + i; // Plaintext passwords for testing
 		            String passwordSalt = "salt" + i; // Plaintext salt for testing
 
-		            // Insert the user into the USERS table
+		            
 		            insertUserStmt.setString(1, username);
 		            insertUserStmt.setString(2, email);
 		            insertUserStmt.setString(3, hashedPassword);
@@ -207,17 +227,17 @@ class DatabaseController {
 					String insertRoles = "INSERT INTO ROLES (role_id, role_name) VALUES (?, ?)";
 					PreparedStatement pstmtRoles = connection.prepareStatement(insertRoles);
 					// Insert Admin Role
-					pstmtRoles.setInt(1, 1);  // role_id
+					pstmtRoles.setInt(1, RoleCodes.ADMIN.get());  // role_id
 					pstmtRoles.setString(2, "Admin");  // role_name for Admin
 					pstmtRoles.executeUpdate();
 
 					// Insert Teacher Role
-					pstmtRoles.setInt(1, 2);  // role_id
-					pstmtRoles.setString(2, "Teacher");  // role_name for Teacher
+					pstmtRoles.setInt(1, RoleCodes.INSTRUCTOR.get());  // role_id
+					pstmtRoles.setString(2, "Instructor");  // role_name for instructor
 					pstmtRoles.executeUpdate();
 					
 					// Insert Student Role
-					pstmtRoles.setInt(1, 3);  // role_id
+					pstmtRoles.setInt(1, RoleCodes.STUDENT.get());  // role_id
 					pstmtRoles.setString(2, "Student");  // role_name for Student
 					pstmtRoles.executeUpdate();
 					
@@ -238,7 +258,7 @@ class DatabaseController {
 		}
 		
 		
-		// Check if the database is empty
+		// Check if the database is empty (has no users). Returns true or false
 		public boolean isDatabaseEmpty() {
 			String query = "SELECT COUNT(*) AS count FROM USERS";
 			try (ResultSet resultSet = statement.executeQuery(query)) {
@@ -253,7 +273,8 @@ class DatabaseController {
 		
 		
 	
-		
+		//Given a String username, returns the user_id of that user.
+		//Returns an Integer, which will be null if the user is not found, so check for that.
 		public Integer getUserIdByUsername(String username) {
 			//gets the UserId provided the username
 			String query = "SELECT id FROM USERS WHERE username = ?";
@@ -271,14 +292,9 @@ class DatabaseController {
 			
 		}
 		
-		
-		public boolean doesUserExist(String username) {
-			//Checks if a user exists by email, by attempting to get their ID.
-		    return getUserIdByUsername(username) != null;
-		}
-		
 		public String getFirstNameById(int id) {
 			//For getting the first_name by ID, to display whenever needed
+			//Will return null if that user isn't found, or if they have not finished registration.
 			String query = "SELECT first_name FROM USERS WHERE id = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 		        pstmt.setInt(1, id);
@@ -296,6 +312,7 @@ class DatabaseController {
 		
 		public String getSaltById(int id) {
 			//For getting the password_salt by the ID, for when you need to hash
+			//Salt is mandatory when creating an account, so this function will only return null when user not found
 			String query = "SELECT password_salt FROM USERS WHERE id = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 		        pstmt.setInt(1, id);
@@ -313,6 +330,7 @@ class DatabaseController {
 		
 		public boolean loginAttempt(int user_id, String username, String hashedPassword) {
 			//Attempts to login by checking if there is a user with that id, username, and hashed_password
+			//Returns true (that user exists, log them in) or false (no user found, might be wrong username or password, don't log them in.)
 			String query = "SELECT * FROM USERS WHERE id = ? AND username = ? AND hashed_password = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 				pstmt.setInt(1, user_id);
@@ -342,6 +360,7 @@ class DatabaseController {
 		
 		public boolean createUser(String username, String hashed_password, String password_salt) {
 			//For initial user creation, you only need to specify the username, hashed_password, and password_salt
+			//Returns a boolean for success or failure
 			String insertion = "MERGE INTO USERS (username, hashed_password, password_salt)"
 					+ "KEY (username) VALUES (?, ?, ?)";
 			try (PreparedStatement pstmt = connection.prepareStatement(insertion)) {
@@ -357,7 +376,7 @@ class DatabaseController {
 		}
 		
 		public void changeUserRoles(int userID, int[] role) {
-			//For changing user roles		
+			//For changing user roles. Tries to delete all roles from them, and then adds the roles in int[] role	
 			int[] roleIntArr = getRoleIdList();
 			for(int i : roleIntArr) {
 				deleteRoleFromUser(userID, i);
@@ -370,6 +389,9 @@ class DatabaseController {
 		}
 		
 		public boolean addRoleToUser(int userID, int roleID) {
+			//adds a role to user with userID of the role roleID
+			//Returns a boolean about success.
+			//Will return true even if that user already had that role, and won't modify it.
 			String addRole = "MERGE INTO USERROLES (user_id, role_id) KEY (user_id, role_id) VALUES (?, ?)";
 			try (PreparedStatement pstmt = connection.prepareStatement(addRole)) {
 				pstmt.setInt(1,userID);
@@ -383,6 +405,8 @@ class DatabaseController {
 		}
 		
 		public boolean deleteRoleFromUser(int userID, int roleID) {
+			//Attempts to delete the given role from the given user. 
+			//Will return false on an error or if that user doesn't have that role.
 			String deleteRole = "DELETE FROM USERROLES where user_id = ? AND role_id = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(deleteRole)) {
 				pstmt.setInt(1,userID);
@@ -397,6 +421,8 @@ class DatabaseController {
 		
 		
 		public int[] getUsersRoleIds(int userID) {
+			//returns a sorted int array of roleIDs for the given user. 
+			//will return a 0 length int array for errors, failure to find user, or user not having any roles
 			List<Integer> roleList = new ArrayList<>();
 			String getRoles = "SELECT role_id FROM USERROLES WHERE user_id = ?";
 			try (PreparedStatement pstmt = connection.prepareStatement(getRoles)) {
@@ -406,6 +432,7 @@ class DatabaseController {
 					roleList.add(rs.getInt("role_id"));
 				}
 				int[] roleIntArr = roleList.stream().mapToInt(Integer::intValue).toArray();
+				Arrays.sort(roleIntArr);
 				return roleIntArr;
 			} catch (SQLException e) {
 				e.printStackTrace();
