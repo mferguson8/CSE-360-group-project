@@ -70,6 +70,7 @@ public class Name {
 
         private Status checkNE(Position which) { //check name exists
             if (!this.exists(which)) {
+                //System.out.println("ret dne 2");
                 return Status.DNE;
             }
 
@@ -95,6 +96,7 @@ public class Name {
             //System.out.println(this.checkedP);
             //System.out.println(this.hasPreferred);
             if (pref && checkedF && checkedM && checkedL) {
+                //System.out.println("returning");
                 return this.names;
             }
             return null;
@@ -121,13 +123,14 @@ public class Name {
         public Status checkNV(Position p) { //check name valididty
             String tname = this.gSName(p);
             if (tname == null) {
+                //System.out.println("ret dne 1");
                 return Status.DNE;
-            } else if(tname.isEmpty() && p == Position.MIDDLE) {
+            } else if(tname.isEmpty()) {
             	//Only middle name is allowed to be empty
-                this.setChecked(p, true);
+                if (p == Position.MIDDLE) this.setChecked(p, true);
                 return Status.EMPTY;
             }
-            if (StrChecker.isNumber(tname.charAt(0))) return Status.HAS_SPEC;
+            if (StrChecker.isNumber(tname.charAt(0))) return Status.OOPN;
 
             boolean end_nums = false;
             char cc = 0;//current char

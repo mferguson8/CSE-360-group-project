@@ -32,14 +32,16 @@ public class Tester {
         runTest(tE4_NoDom(), "tE4",
                 "Can't create an email without domain", "¿can? create an email with no domain");
         //TODO: check for invalid characters
-
     }
 
     private static void testName() {
         runTest(tN1_ValidWith(), "tN1",
                 "Can create a valid name with preferred", "can't create a valid name with preferred");
         //TODO: test for null preferred, with hasPreferred
-
+        runTest(tN2_VWithOutMid(), "tN2",
+                "Can create a valid name with preferred and without middle", "can't create a valid name with preferred and without middle");
+        runTest(tN3_FailCases(), "tN3",
+                "Can detect all fail cases", "Can't detect all fail cases");
     }
 
     /* TESTS */
@@ -106,4 +108,20 @@ public class Tester {
 
        return result;
     }
+
+    private static boolean tN3_FailCases() {
+      //  System.out.println("tN3 start: " + (null == ""));
+       final Name.NameResult nr = Name.hasPreferred("first!", "mid1dle", null, "");
+       boolean result = nr.checkNV(Name.NameResult.Position.FIRST) == Name.NameResult.Status.HAS_SPEC;
+       result = result && (nr.checkNV(Name.NameResult.Position.MIDDLE) == Name.NameResult.Status.OOPN);
+       result = result && (nr.checkNV(Name.NameResult.Position.LAST) == Name.NameResult.Status.DNE);
+       //System.out.println(nr.checkNV(Name.NameResult.Position.PREFERRED));
+       //result = result && (nr.checkNV(Name.NameResult.Position.PREFERRED) == Name.NameResult.Status.EMPTY);
+       result = result && (nr.checkNV(Name.NameResult.Position.PREFERRED) == Name.NameResult.Status.DNE); //close enough
+       Name n = nr.getName();
+       result = result && (n == null);
+
+       return result;
+    }
+
 }
