@@ -28,6 +28,8 @@ public class Tester {
                 "Can't create an email with multiple @s", "¿can? create an email with multiple @s");
         runTest(tE3_MustHaveTopDom(), "tE3",
                 "Can't create an email with no top level domain", "¿can? create an email with no top level domain");
+        runTest(tE4_NoDom(), "tE4",
+                "Can't create an email without domain", "¿can? create an email with no domain");
 
     }
 
@@ -54,9 +56,18 @@ public class Tester {
         final String testStr = "test@testtest";
         Email.EmailResult er = Email.make_email(testStr);
         Email.EmailResult.Status erc = er.check();
-        if (erc == Email.EmailResult.Status.NO_DOM) return true;
+        if (erc == Email.EmailResult.Status.INV_DOM) return true;
 
         return false;
     }
 
+
+    private static boolean tE4_NoDom() {
+        final String testStr = "testtest.test";
+        Email.EmailResult er = Email.make_email(testStr);
+        Email.EmailResult.Status erc = er.check();
+        if (erc == Email.EmailResult.Status.NO_DOM) return true;
+
+        return false;
+    }
 }
