@@ -24,8 +24,8 @@ public class HPassword { //hashed password
     public static class OTP {
         String otp;
 
-        final static int OTPL= 8; // one time password length
-        final static RngStrGen RSG = new RngStrGen(true, false, false);// numbers only
+        final static int OTPL= 12; // one time password length
+        final static RngStrGen RSG = new RngStrGen(true, true, true);
 
         public static OTP getOTP() {
             return new OTP(RSG.generate(OTPL));
@@ -38,6 +38,26 @@ public class HPassword { //hashed password
 
         public String get() {return this.otp;}
         public HPassword toHashed() {return HPassword.hashSalt(this.otp);}
+
+    }
+    
+    public static class IC {
+    	//For invite codes
+        String ic;
+
+        final static int ICL= 8; // one time password length
+        final static RngStrGen RSG = new RngStrGen(true, false, false);// numbers only
+
+        public static IC getIC() {
+            return new IC(RSG.generate(ICL));
+
+        }
+
+        private IC(String nic) { //nic - new invite code
+            this.ic = nic;
+        }
+
+        public String get() {return this.ic;}
 
     }
 }

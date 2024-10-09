@@ -53,7 +53,7 @@ public class Name {
             HAS_SPEC, //has special
             DNE, //does not exist
             OOPN, //out of place number
-            IS_NULL,
+            EMPTY, //If the name is an empty string (only allowed for middle)
             SUCCESS
         }
 
@@ -114,7 +114,13 @@ public class Name {
 
         public Status checkNV(Position p) { //check name valididty
             String tname = this.gSName(p);
-            if (tname == null) return Status.DNE;
+            if (tname == null) {
+                return Status.DNE;
+            } else if(tname.isEmpty() && p == Position.MIDDLE) {
+            	//Only middle name is allowed to be empty
+                this.setChecked(p, true);
+                return Status.EMPTY;
+            }
             if (StrChecker.isNumber(tname.charAt(0))) return Status.HAS_SPEC;
 
             boolean end_nums = false;

@@ -183,7 +183,8 @@ public class HelloApplication extends Application {
     }
     
     public String createInviteCode(int[] roles) {
-    	String inviteCode = codeGenerator.generate(12); 
+    	
+    	String inviteCode = HPassword.IC.getIC().get(); 
     	for(int i: roles) {
     		database.addInviteCodeRole(inviteCode, i);
     		//TODO: Check here for problems?
@@ -194,7 +195,7 @@ public class HelloApplication extends Application {
     
     
     public void adminResetPassword(int user_id) {
-    	String newPassword = codeGenerator.generate(12); 
+    	String newPassword = HPassword.OTP.getOTP().get(); 
     	String password_salt = database.getSaltById(user_id);
     	String newHashedPassword = hashString(newPassword + password_salt);
     	database.adminResetPassword(user_id, newHashedPassword); //Check here for problems? Handle errors from false output.

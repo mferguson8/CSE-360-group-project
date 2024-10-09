@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+
 // Some of these unnecessary so far 
 //import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -800,6 +801,67 @@ public class GUIController implements EventHandler<ActionEvent>{
             String middleName = enterMiddleName.getText();
             String lastName = enterLastName.getText();
             String preferredName = enterPreferredName.getText();
+            
+           
+            
+            Email.EmailResult email_check = Email.make_email(email);
+            switch(email_check.check()) {
+            	case NO_DOM:
+            		showAlert("Email has no domain");
+            		return;
+            	case MULT_ATS:
+            		showAlert("Email has multiple @ symbols");
+            		return;
+            	case INV_DOM:
+            		showAlert("Not a valid domain name");
+            		return;
+            	case SUCCESS:
+            }
+            Name.NameResult name_check;
+            Name.NameResult.Position[] positionsToCheck;
+            if(preferredName.trim().isEmpty()) {
+            	name_check = Name.noPreferred(firstName, middleName, lastName);
+            	positionsToCheck = new Name.NameResult.Position[]{Name.NameResult.Position.FIRST, 
+            			Name.NameResult.Position.MIDDLE,
+            			Name.NameResult.Position.LAST};
+            } else {
+            	name_check = Name.hasPreferred(firstName, middleName, lastName, preferredName);
+            	positionsToCheck = new Name.NameResult.Position[]{Name.NameResult.Position.FIRST, 
+            			Name.NameResult.Position.MIDDLE,
+            			Name.NameResult.Position.LAST,
+            			Name.NameResult.Position.PREFERRED};
+            }
+            Name names = name_check.getName();
+            if(names == null) {
+            	StringBuilder nameError = new StringBuilder();
+            	nameError.append("Names don't meet the following requirements:");
+	            for(Name.NameResult.Position currentPosition: positionsToCheck) {
+            		switch(name_check.checkNV(currentPosition)) {
+	            		case Name.NameResult.Status.START_NUM:
+	            			nameError.append("First name starts with numbers; ");
+	            			break;
+	            		case Name.NameResult.Status.HAS_SPEC:
+	            			nameError.append("First name contains special characters; ");
+	            			break;
+	            		case Name.NameResult.Status.DNE:
+	            			nameError.append("ERROR: First name does not exist; ");
+	            			break;
+	            		case Name.NameResult.Status.OOPN:
+	            			nameError.append("First name has an out of place number; ");
+	            			break;
+	            		case Name.NameResult.Status.SUCCESS:
+	            		default:
+	            	}
+	            }
+	          showAlert(nameError.toString()); 
+	          return;
+	          //This might be really long and I'm not sure how showAlert will deal with that.
+	          //TODO: Test this.
+            }
+            
+            
+            
+            
             
             enterEmail.clear();
             enterFirstName.clear();
