@@ -30,9 +30,7 @@ import javafx.scene.control.ButtonType;
 
 // TO DO (Alysa) 
 	// Add comments
-	// Add different types of backButton 
-	// Finish fixing format for add/remove roles, and invite, possibly login too
-
+	// Add different types of backButton (May not be necessary for phase 1)
 
 
 /**
@@ -157,8 +155,7 @@ public class GUIController implements EventHandler<ActionEvent>{
     public void initialize(Stage mainStage, HelloApplication helloApp) {
     	this.mainStage = mainStage;
 		this.helloApp = helloApp;
-		//switchScene(login_page()); // Placeholder 
-		switchScene(adminHomePage()); //TODO FOR TEST. MUST REMOVE
+		switchScene(login_page()); // Placeholder 
     }
     
     /**
@@ -452,26 +449,39 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 	public Scene inviteUser() {
 		
+		setTitle("Invite User");
+		
+		Label labelInvite = new Label("Please check which roles you want to give the new user: ");
+		setupLabelUI(labelInvite, "Arial", 18, windowX, 
+				Pos.CENTER, 1, 20);
+		
 		selAdmin = new CheckBox();
 		selAdmin.setText("Admin");
+		selAdmin.setLayoutX(20);
+		selAdmin.setLayoutY(50);
 		
 		selInstructor = new CheckBox();
 		selInstructor.setText("Instructor");
+		selInstructor.setLayoutX(20);
+		selInstructor.setLayoutY(70);
 		
 		selStudent = new CheckBox();
 		selStudent.setText("Student");
+		selStudent.setLayoutX(20);
+		selStudent.setLayoutY(90);
 		
 		confirmRoles = new Button();
-		confirmRoles.setText("Confirm");
+		setupButtonUI(confirmRoles, "Confirm", 50, Pos.CENTER, 20, 120);
+
 		confirmRoles.setOnAction(this);
 		
 		backButton = new Button();
-		backButton.setText("Back");	
+		setupButtonUI(backButton, "Back", 50, Pos.CENTER, 5, windowY - 30);
 		backButton.setOnAction(this);
 		
-		VBox inviteUserRoot = new VBox(20);
+		Pane inviteUserRoot = new Pane();
 		
-		inviteUserRoot.getChildren().addAll(selAdmin, selInstructor, selStudent, confirmRoles, backButton);
+		inviteUserRoot.getChildren().addAll(labelInvite, selAdmin, selInstructor, selStudent, confirmRoles, backButton);
 		
 		Scene inviteUserScene = new Scene(inviteUserRoot, windowX, windowY);
 		return inviteUserScene;
@@ -482,6 +492,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 	 * Finish list 
 	 */
 	public Scene listUsers(/*List<User> users*/) { // If using the TESTING getItems, take away parameter
+
+		setTitle("List Users");
 		// users from Users class 
 		TableView<User> userTable = new TableView<>();
 		List<User> users = new ArrayList<>();
@@ -598,30 +610,48 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 
 	public Scene addRoleToUser() {
-
+		
+		setTitle("Add Roles to User");
+		
+		Label labelUserID = new Label("Enter the user ID of the user to edit: ");
+		setupLabelUI(labelUserID, "Arial", 14, windowX, 
+				Pos.BASELINE_LEFT, 1, 20);
+		
 		enterUserID = new TextField();
-		enterUserID.setPromptText("Enter the Username");
+		enterUserID.setPromptText("Enter the user (ID/name)");
+		setupTextUI(enterUserID, "Arial", 12, windowX - 20, Pos.BASELINE_LEFT, 10, 40 , "Enter User ID: ");
+		
+		Label labelAddRoles = new Label("Please check which roles you want to add to the user: ");
+		setupLabelUI(labelAddRoles, "Arial", 14, windowX, 
+				Pos.BASELINE_LEFT, 1, 80);
+		
 
 		addAdmin = new CheckBox();
 		addAdmin.setText("Admin");
+		addAdmin.setLayoutX(20);
+		addAdmin.setLayoutY(100);
 
 		addInstructor = new CheckBox();
 		addInstructor.setText("Instructor");
+		addInstructor.setLayoutX(20);
+		addInstructor.setLayoutY(120);
 
 		addStudent = new CheckBox();
 		addStudent.setText("Student");
+		addStudent.setLayoutX(20);
+		addStudent.setLayoutY(140);
 
 		addRole = new Button();
-		addRole.setText("Add");
+		setupButtonUI(addRole, "Add", 50, Pos.CENTER, 20, 170);
 		addRole.setOnAction(this);
 
 		backButton = new Button();
-		backButton.setText("Back");	
+		setupButtonUI(backButton, "Back", 50, Pos.CENTER, 5, windowY - 30);
 		backButton.setOnAction(this);
 		
-		VBox addRoleRoot = new VBox(20);
+		Pane addRoleRoot = new Pane();
 		
-		addRoleRoot.getChildren().addAll(enterUserID, addAdmin, addInstructor, addStudent, addRole, backButton);
+		addRoleRoot.getChildren().addAll(labelAddRoles, labelUserID, enterUserID, addAdmin, addInstructor, addStudent, addRole, backButton);
 		
 		Scene addRoleScene = new Scene(addRoleRoot, windowX, windowY);
 		return addRoleScene;
@@ -629,52 +659,51 @@ public class GUIController implements EventHandler<ActionEvent>{
 	
 	public Scene removeRoleFromUser() {
 
+		setTitle("Add Roles to User");
+		
+		Label labelUserID = new Label("Enter the user ID of the user to edit: ");
+		setupLabelUI(labelUserID, "Arial", 14, windowX, 
+				Pos.BASELINE_LEFT, 1, 20);
+		
 		enterUserID = new TextField();
-		enterUserID.setPromptText("Enter the Username");
+		enterUserID.setPromptText("Enter the user (ID/name)");
+		setupTextUI(enterUserID, "Arial", 12, windowX - 20, Pos.BASELINE_LEFT, 10, 40 , "Enter User ID: ");
+		
+		Label labelRemoveRoles = new Label("Please check which roles you want to remove from the user: ");
+		setupLabelUI(labelRemoveRoles, "Arial", 14, windowX, 
+				Pos.BASELINE_LEFT, 1, 80);
+		
 
 		removeAdmin = new CheckBox();
 		removeAdmin.setText("Admin");
+		removeAdmin.setLayoutX(20);
+		removeAdmin.setLayoutY(100);
 
 		removeInstructor = new CheckBox();
 		removeInstructor.setText("Instructor");
+		removeInstructor.setLayoutX(20);
+		removeInstructor.setLayoutY(120);
 
 		removeStudent = new CheckBox();
 		removeStudent.setText("Student");
+		removeStudent.setLayoutX(20);
+		removeStudent.setLayoutY(140);
 
 		removeRole = new Button();
-		removeRole.setText("Remove");
+		setupButtonUI(removeRole, "Add", 50, Pos.CENTER, 20, 170);
 		removeRole.setOnAction(this);
-		
-		backButton = new Button();
-		backButton.setText("Back");	
-		backButton.setOnAction(this);
 
-		VBox removeRoleRoot = new VBox(20);
+		backButton = new Button();
+		setupButtonUI(backButton, "Back", 50, Pos.CENTER, 5, windowY - 30);
+		backButton.setOnAction(this);
 		
-		removeRoleRoot.getChildren().addAll(enterUserID, removeAdmin, removeInstructor, removeStudent, removeRole, backButton);
+		Pane removeRoleRoot = new Pane();
+		
+		removeRoleRoot.getChildren().addAll(labelRemoveRoles, labelUserID, enterUserID, removeAdmin, removeInstructor, removeStudent, removeRole, backButton);
 		
 		Scene removeRoleScene = new Scene(removeRoleRoot, windowX, windowY);
 		return removeRoleScene;
 	}
-
-	public Scene instructorHomePage() {
-		
-		logout = new Button();
-		logout.setText("Logout");
-		logout.setOnAction(this);
-		
-		//Removed back button from this. We don't want no back button on home pages.
-
-
-		
-		VBox instructorHomeRoot = new VBox(20);
-		
-		instructorHomeRoot.getChildren().addAll(logout);
-
-		Scene instructorHomeScene = new Scene(instructorHomeRoot, windowX, windowY);
-		return instructorHomeScene;
-	}
-	
 	
 	public Scene studentHomePage() {
 		
