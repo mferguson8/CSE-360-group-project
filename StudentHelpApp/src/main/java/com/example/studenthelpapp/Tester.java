@@ -15,9 +15,9 @@ public class Tester {
         testsRun += 1;
         if (result) {
             testsSuccess += 1;
-            System.out.println(TID + ": "+ success);
+            System.out.println(TID + " (success): "+ success);
         }
-        else System.out.println(TID + ":  " + fail);
+        else System.out.println(TID + " (failure):  " + fail);
     }
 
     /* RUN TESTS */
@@ -26,8 +26,8 @@ public class Tester {
                 "Can create a valid email", "can't create a valid email");
         runTest(tE2_OneAtOnly(), "tE2",
                 "Can't create an email with multiple @s", "¿can? create an email with multiple @s");
-        //runTest(tE3_OneAtOnly(), "tE3",
-        //        "Can't create an email with multiple @s", "¿can? create an email with multiple @s");
+        runTest(tE3_MustHaveTopDom(), "tE3",
+                "Can't create an email with no top level domain", "¿can? create an email with no top level domain");
 
     }
 
@@ -45,14 +45,18 @@ public class Tester {
         Email.EmailResult er = Email.make_email(testStr);
         Email.EmailResult.Status erc = er.check();
         if (erc == Email.EmailResult.Status.MULT_ATS) return true;
+        //room for debugging info if needed
 
-        //System.out.print("\t");
-        //switch (erc) {
-        //    case NO_DOM:
-        //}
         return false;
     }
 
+    private static boolean tE3_MustHaveTopDom() {
+        final String testStr = "test@testtest";
+        Email.EmailResult er = Email.make_email(testStr);
+        Email.EmailResult.Status erc = er.check();
+        if (erc == Email.EmailResult.Status.NO_DOM) return true;
 
+        return false;
+    }
 
 }
