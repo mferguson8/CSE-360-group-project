@@ -3,6 +3,7 @@ public class Tester {
     static int testsSuccess = 0;
     public static void main(String[] args) {
         testEmail();
+        testName();
 
         float tRCast = testsRun;
         float tSCast = testsSuccess;
@@ -30,6 +31,14 @@ public class Tester {
                 "Can't create an email with no top level domain", "¿can? create an email with no top level domain");
         runTest(tE4_NoDom(), "tE4",
                 "Can't create an email without domain", "¿can? create an email with no domain");
+        //TODO: check for invalid characters
+
+    }
+
+    private static void testName() {
+        runTest(tN1_ValidWith(), "tN1",
+                "Can create a valid name with preferred", "can't create a valid name with preferred");
+        //TODO: test for null preferred, with hasPreferred
 
     }
 
@@ -69,5 +78,14 @@ public class Tester {
         if (erc == Email.EmailResult.Status.NO_DOM) return true;
 
         return false;
+    }
+
+    private static boolean tN1_ValidWith() {
+       final Name.NameResult nr = Name.hasPreferred("first", "middle", "last", "pref");
+       boolean result = nr.checkNV(Name.NameResult.Position.FIRST) == Name.NameResult.Status.SUCCESS;
+       result = result && (nr.checkNV(Name.NameResult.Position.MIDDLE) == Name.NameResult.Status.SUCCESS);
+       result = result && (nr.checkNV(Name.NameResult.Position.LAST) == Name.NameResult.Status.SUCCESS);
+       result = result && (nr.checkNV(Name.NameResult.Position.PREFERRED) == Name.NameResult.Status.SUCCESS);
+       return result;
     }
 }

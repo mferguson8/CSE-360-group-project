@@ -1,4 +1,4 @@
-package com.example.studenthelpapp;
+//package com.example.studenthelpapp;
 
 public class Name {
     String first;
@@ -49,7 +49,7 @@ public class Name {
         Name names;
 
         public static enum Status {
-            START_NUM, //starts with numbers
+            //START_NUM, //starts with numbers
             HAS_SPEC, //has special
             DNE, //does not exist
             OOPN, //out of place number
