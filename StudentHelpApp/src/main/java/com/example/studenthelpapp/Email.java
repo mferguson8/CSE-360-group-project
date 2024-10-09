@@ -1,4 +1,4 @@
-//package com.example.studenthelpapp;
+package com.example.studenthelpapp;
 
 public class Email {
     // sections as dictated by: https://itstillworks.com/3-parts-email-address-22094.html

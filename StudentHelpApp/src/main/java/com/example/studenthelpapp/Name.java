@@ -1,4 +1,4 @@
-//package com.example.studenthelpapp;
+package com.example.studenthelpapp;
 
 public class Name {
     String first;
@@ -53,7 +53,7 @@ public class Name {
         Name names;
 
         public static enum Status {
-            //START_NUM, //starts with numbers
+            START_NUM, //starts with numbers
             HAS_SPEC, //has special
             DNE, //does not exist
             OOPN, //out of place number
@@ -130,7 +130,7 @@ public class Name {
                 if (p == Position.MIDDLE) this.setChecked(p, true);
                 return Status.EMPTY;
             }
-            if (StrChecker.isNumber(tname.charAt(0))) return Status.OOPN;
+            if (StrChecker.isNumber(tname.charAt(0))) return Status.HAS_SPEC;
 
             boolean end_nums = false;
             char cc = 0;//current char
