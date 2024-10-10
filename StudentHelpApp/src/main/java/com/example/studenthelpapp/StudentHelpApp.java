@@ -15,7 +15,7 @@ import com.example.studenthelpapp.DatabaseController.RoleCodes;
 
 import java.io.IOException;
 
-public class HelloApplication extends Application {
+public class StudentHelpApp extends Application {
 	private int loggedInUserID; //Store the id of the loggedInUser
 	private GUIController gui;	//Object to interface with gui
 	private DatabaseController database; //Object to interface with database

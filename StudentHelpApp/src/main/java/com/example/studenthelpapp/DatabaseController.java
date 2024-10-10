@@ -250,7 +250,7 @@ class DatabaseController {
 			
 			
 			System.out.println("All tables created");
-			fakePeople(); //TODO THIS IS FOR TESTING, REMOVE
+			//fakePeople(); //TODO THIS IS FOR TESTING, REMOVE
 			
 			//TODO Here
 			//Populate topicsTable and ComfortLevelsTable 

@@ -48,7 +48,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 	
 	
 	private Stage mainStage;
-	private HelloApplication helloApp;
+	private StudentHelpApp helpApp;
+
 	
 	//////////////// Still need to add labels for all ////////////////////
 	
@@ -147,11 +148,11 @@ public class GUIController implements EventHandler<ActionEvent>{
     /**
      * Initializer 
      * @param mainStage
-     * @param helloApp
+     * @param helpApp
      */
-    public void initialize(Stage mainStage, HelloApplication helloApp) {
+    public void initialize(Stage mainStage, StudentHelpApp helpApp) {
     	this.mainStage = mainStage;
-		this.helloApp = helloApp;
+		this.helpApp = helpApp;
 		switchScene(login_page()); // Placeholder 
     }
     
@@ -219,7 +220,7 @@ public class GUIController implements EventHandler<ActionEvent>{
     /**
      * Login
      * @param mainStage
-     * @param helloApp
+     * @param helpApp
      */
 	public Scene login_page() {
 
@@ -544,7 +545,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 		// users from Users class 
 		TableView<User> userTable = new TableView<>();
 		List<User> users = new ArrayList<>();
-		String userString = helloApp.listUsers();
+		String userString = helpApp.listUsers();
 		String[] rows = userString.split("\n"); //Split the string on \n, so each user is a row
 		for(String row: rows) {
 			if(row.trim().isEmpty()) //For last substring, potentially empty
@@ -856,15 +857,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 	
-	/* NEVER USED
-	 
-	private void handleButtonPress() { //Triggered when someone presses the button
-		if(helloApp != null) {
-			helloApp.onButtonPressed(); //Calls a function in HelloApplication
-		}
-	}	
-	*/
-	
 	/**
 	 * Handle button
 	 */
@@ -887,7 +879,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 				createPassword.clear();
 				confirmPassword.clear();
 				//Calls createUser for logic handling
-				helloApp.createUser(this.inviteCode, username, password1);
+				helpApp.createUser(this.inviteCode, username, password1);
 				this.inviteCode = null; 
 				//Removes storage of inviteCode, no longer needed in GUIController at this point
 			}
@@ -907,8 +899,8 @@ public class GUIController implements EventHandler<ActionEvent>{
             enterPassword.clear();
            
             
-            //Passes typed username and password to helloApp for logic.
-        	helloApp.handleLoginAttempt(username, password);
+            //Passes typed username and password to helpApp for logic.
+        	helpApp.handleLoginAttempt(username, password);
 
 		}
 
@@ -921,7 +913,7 @@ public class GUIController implements EventHandler<ActionEvent>{
             // Calls handleInviteCodeAttempt, which will check the validity and manage next steps
 
             
-            helloApp.handleInviteCodeAttempt(code);
+            helpApp.handleInviteCodeAttempt(code);
 		}
 
 		// Finish Set Up Handling 
@@ -1001,7 +993,7 @@ public class GUIController implements EventHandler<ActionEvent>{
             enterPreferredName.clear();
             
             //Call the userSetup function
-            helloApp.finishUserSetup(email, firstName, middleName, lastName, preferredName);
+            helpApp.finishUserSetup(email, firstName, middleName, lastName, preferredName);
 		}
 
 		
@@ -1051,7 +1043,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 			}
 			int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
 			//Create the invite code
-			String code = helloApp.createInviteCode(roleArr);
+			String code = helpApp.createInviteCode(roleArr);
 			//Display the invite code
 			codeAlert.setTitle("Invitation Code!");
 			codeAlert.setContentText("The invitation code is: "+code);
@@ -1065,11 +1057,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 		else if (event.getSource() == resetPass) {
 			//Get the userId for the username the admin entered
 			String username = enterUserID.getText();
-			Integer id = helloApp.getUsernameId(username);
+			Integer id = helpApp.getUsernameId(username);
 			if(id != null) {
 				//if the id is valid, reset that user's password
 				enterUserID.clear();
-				helloApp.adminResetPassword(id);
+				helpApp.adminResetPassword(id);
 				switchScene(adminHomePage());
 			} else {
 				showAlert("User with that Username not found");
@@ -1087,7 +1079,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 				//Reset their password to the new password
 				newPass.clear();
 				confirmNewPass.clear();
-				helloApp.resetUserPassword(newPassword);
+				helpApp.resetUserPassword(newPassword);
 			} else {
 				
 				showAlert("Passwords do not match");
@@ -1107,7 +1099,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 		else if (event.getSource() == deleteUserButton) {
 			//Get the userID of that username and check if its valid
 			String userToDelete = enterUserID.getText();
-			Integer id = helloApp.getUsernameId(userToDelete);
+			Integer id = helpApp.getUsernameId(userToDelete);
 			if(id != null) {
 				//Get confirmation that they want to delete this user
 				sure = new Alert(AlertType.CONFIRMATION);
@@ -1120,7 +1112,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 				if(result.isPresent() && (result.get() == yesButton)) {
 					//If they press yes, delete the user
 					enterUserID.clear();
-					helloApp.deleteUser(id);
+					helpApp.deleteUser(id);
 				} else if(result.isPresent() && (result.get() == noButton)) {
 					enterUserID.clear();
 				}
@@ -1144,7 +1136,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 			boolean instructorSelected = addInstructor.isSelected();
 			boolean studentSelected = addStudent.isSelected();
 			//If the username is valid, add the role codes to a list
-			Integer id = helloApp.getUsernameId(username);
+			Integer id = helpApp.getUsernameId(username);
 			if(id != null) {
 				enterUserID.clear();
 				List<Integer> roles = new ArrayList<>();
@@ -1160,7 +1152,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 			
 				int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
 				//Add those roles from the id for that username
-				helloApp.addRoles(id, roleArr);
+				helpApp.addRoles(id, roleArr);
 				//Display a success
 				showAlert("Roles added");
 				//Go to the homepage
@@ -1184,7 +1176,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 			boolean instructorSelected = removeInstructor.isSelected();
 			boolean studentSelected = removeStudent.isSelected();
 			//If the username is valid, add the role codes to a list
-			Integer id = helloApp.getUsernameId(username);
+			Integer id = helpApp.getUsernameId(username);
 			if(id != null) {
 				enterUserID.clear();
 				List<Integer> roles = new ArrayList<>();
@@ -1199,7 +1191,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 				}
 				int[] roleArr = roles.stream().mapToInt(i->i).toArray(); 
 				//Remove those roles from the id for that username
-				helloApp.removeRoles(id, roleArr);
+				helpApp.removeRoles(id, roleArr);
 				//Display a success
 				showAlert("Roles removed");
 				//Go to the homepage
@@ -1216,7 +1208,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 			switchScene(adminHomePage());
 		}
 		else if (event.getSource() == logout) {
-			helloApp.logoutCurrentUser();
+			helpApp.logoutCurrentUser();
 			switchScene(login_page());
 		}
 		

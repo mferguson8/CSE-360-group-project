@@ -1,3 +1,5 @@
+package com.example.studenthelpapp;
+
 public class Tester {
     static int testsRun = 0;
     static int testsSuccess = 0;
