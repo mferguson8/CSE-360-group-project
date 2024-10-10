@@ -28,14 +28,9 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
 
-// TO DO (Alysa) 
-	// Add comments
-	// Add different types of backButton (May not be necessary for phase 1)
-
-
 /**
  * 
- * GUI
+ * The GUIController class which creates the interface for the Student Help Application
  * 
  */
 public class GUIController implements EventHandler<ActionEvent>{
@@ -50,8 +45,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 	private Stage mainStage;
 	private StudentHelpApp helpApp;
 
-	
-	//////////////// Still need to add labels for all ////////////////////
 	
 	// For easy change of window size
 		private int windowX = 500;
@@ -133,11 +126,6 @@ public class GUIController implements EventHandler<ActionEvent>{
     
     // UI components for student home page 
 
-    
-    // Show Alert
-    private Button okAlert;
-    private Label Alert;
-
 	// Back Buttons 
 	private Button backButton; // Back to admin home
     
@@ -156,9 +144,13 @@ public class GUIController implements EventHandler<ActionEvent>{
 		switchScene(login_page()); // Placeholder 
     }
     
-    /**
-     * Create account 
-     */
+
+	/**
+	 * Create Account Scene
+	 * Here, the user will create their account 
+	 * @params invite_code   // the code given to a user that is required to make an account
+	 * @return createAccountScene    // for switching scenes
+	 */
        public Scene create_account(String invite_code) {		
 
 		//For when a user has submitted a valid invite code,
@@ -218,9 +210,10 @@ public class GUIController implements EventHandler<ActionEvent>{
     }
 	
     /**
-     * Login
-     * @param mainStage
-     * @param helpApp
+     * Login Scene 
+	 * Here, existing users can log in to their account
+	 * and new users can enter the invite code to register
+	 * @return loginScene    
      */
 	public Scene login_page() {
 
@@ -271,11 +264,13 @@ public class GUIController implements EventHandler<ActionEvent>{
 			return loginScene;
 	}
 	
-	
+
 	/**
 	 * Finish set up Scene
+	 * Here, users can finish setting up their account 
+	 * @return finishSetUpScene   
 	 */
-		public Scene finishSetUp() {
+	public Scene finishSetUp() {
 		//For when a user logs in and needs to finish registration. Allows them to enter
 		//email, first name, middle name, last name, preferred name
 		Label labelFinish = new Label("You must finish setting up your account before logging in!");
@@ -343,8 +338,9 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 	/**
-	 * Role scene
-	 * Incomplete, or need more scenes so that only the one's that apply show up
+	 * Select Role scene
+	 * If a user has mutliple roles, they can select which role they want to be for this session
+	 * @return  selectRoleScene     
 	 */
 	public Scene selectRole(int[] roles) { 
 		//Scene for when someone with multiple roles logs in. Provides them a button for each role they have
@@ -378,8 +374,9 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Admin Homepage Scene
+	 * This scene allows admin to see and use admin commands 
+	 * @return adminHomeScene
 	 */
 	public Scene adminHomePage() { 
 		
@@ -459,6 +456,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 		return adminHomeScene;
 	}
 
+	/**
+	 * Invite User Scene
+	 * Admin command where admin can get an invite code 
+	 * @return inviteUserScene 
+	 */
 	public Scene inviteUser() {
 		//For when the admin wants to generate an invite code,
 		//and has to select the associated roles
@@ -533,10 +535,12 @@ public class GUIController implements EventHandler<ActionEvent>{
 	
 
 	/**
-	 * Finish list 
+	 * Users List
+	 * Admin command that allows admin to see all users and their username, first name, and role(s)
+	 * @return listUsersScene 
 	 */
+	public Scene listUsers() { 
 
-	public Scene listUsers(/*List<User> users*/) { 
 		//Scene for when the admin wants to list users.
 		//Will list all users in a table
 		//Only lists users username, First and Last name, and role ids
@@ -589,8 +593,9 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 	/**
-	 * For admin to reset password
-	 * @return
+	 * Rest User Password Scene
+	 * Admin command to reset the password of a specific user
+	 * @return resetUserScene
 	 */
 	public Scene resetUserPass() { 
 
@@ -632,8 +637,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 	
 	/**
-	 * For user to reset password after given code 
-	 * @return
+	 * Changing Password Scene
+	 * The page the user is directed to when they enter the one-time password to reset, 
+	 * which allows them to change their password
+	 * @return changePassScene
 	 */
 	public Scene changePass() {
 		//For when a user is being forced to change their password, after an admin initiated a password reset on them
@@ -658,7 +665,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 		return changePassScene;
 	}
 
-
+	/**
+	 * Delete User Scene
+	 * Admin command to permanently delete a user 
+	 * @return deleteUserScene
+	 */
 	public Scene deleteUser() {
 
 		//Scene for when the admin wants to delete a user, (has to provide their username)
@@ -696,6 +707,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 	}
 
+	/**
+	 * Add Role to User Scene
+	 * Admin command allowing admin to add role(s) to an existing user
+	 * @return addRoleScene
+	 */
 	public Scene addRoleToUser() {
 
 		//Scene for when the admin wants to add a role to a user, (has to provide their username)
@@ -748,6 +764,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 		return addRoleScene;
 	}
 	
+	/**
+	 * remove Role from User Scene
+	 * Admin command allowing admin to remove role(s) from an existing user
+	 * @return removeRoleScene
+	 */
 	public Scene removeRoleFromUser() {
 
 		//Scene for when the admin wants to remove a role from a user, (has to provide their username)
@@ -799,7 +820,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 		return removeRoleScene;
 	}
 
-
+	/**
+	 * Instructor Homepage Scene
+	 * This allows instructor users to see their home page and commands
+	 * @return instructorHomeScene
+	 */
 	public Scene instructorHomePage() {
 		//The homepage for instructors (or multi-roles that chose instructors)
 				//Only has logout as of now
@@ -815,7 +840,11 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 	
 
-	
+	/**
+	 * Student Homepage Scene
+	 * This allows student users to see their home page and commands
+	 * @return studentHomeScene
+	 */
 	public Scene studentHomePage() {
 
 		//The homepage for students (or multi-roles that chose students)
@@ -858,7 +887,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	
 	
 	/**
-	 * Handle button
+	 * Handle Button
 	 */
 	public void handle(ActionEvent event) {
 
@@ -1223,6 +1252,10 @@ public class GUIController implements EventHandler<ActionEvent>{
 		
 	}
 	
+	/**
+	 * Show Alert
+	 * To create alert diaglogue
+	 */
 	public void showAlert(String message) {
 	    // Create an Alert dialog
 	    Alert alert = new Alert(AlertType.INFORMATION);
@@ -1235,7 +1268,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 	}
 
 	/**************************************
-	 * Note: Stuff below not used much yet, got it from HW#5, will probably use to pretty up GUI soon
+	 * Button, textfield, and label UI setup
 	 ***************************************/
 	
 	/**
