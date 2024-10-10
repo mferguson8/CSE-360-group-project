@@ -28,12 +28,13 @@ public class adminTools {
 	}
 	
 	Scanner input = new Scanner(System.in);
-	public void deleteUser(User currUser, User deleteUser) {
+	public void deleteUser(User currUser, User deleteUser) {		
 		if (currUser.getRole().equals("admin")) {
-			if (deleteUser.getRole().equals("student")) {
+			if (deleteUser.getRole().equals("student")) {			
 				System.out.println("Are you sure. (Y/N");
-				String input = input.nextLine();
-				if (input.equals("Y")) {
+				String choice = input.nextLine();
+				
+				if (choice.equals("Y")) {
 					deleteUser = null;
 					numUsers--;
 					numStudents--;
