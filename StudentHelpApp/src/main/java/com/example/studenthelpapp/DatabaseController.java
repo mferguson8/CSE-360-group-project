@@ -56,7 +56,7 @@ class DatabaseController {
 				System.out.println("Connecting to database...");
 				connection = DriverManager.getConnection(DB_URL, USER, PASS);
 				statement = connection.createStatement(); 
-				//wipeDatabase(); //TODO: This is for testing. Remove
+				
 				
 				createTables();  // Create the necessary tables if they don't exist
 				System.out.println("Connected to database!");
@@ -68,85 +68,7 @@ class DatabaseController {
 		}
 		
 		
-		private void wipeDatabase() {	
-			//TODO: THIS IS ONLY FOR TESTING. REMOVE
-		    String sql = "DROP ALL OBJECTS";
-		    try (Statement stmt = connection.createStatement()) {
-		        stmt.execute(sql);
-		        System.out.println("All objects in the database have been dropped.");
-		    } catch (SQLException e) {
-		        e.printStackTrace();
-		    }
-		}
-
-		private void fakePeople() {
-		   
-		    String[] firstNames = {"John", "Jane", "Michael", "Emily", "David", "Emma", "Chris", "Sophia", "Daniel", "Olivia"};
-		    String[] lastNames = {"Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor"};
-		    
-		    
-		    Random random = new Random();
-
-		    try {
-		        
-		        String insertUserSQL = "INSERT INTO USERS (username, email, hashed_password, first_name, middle_name, last_name, password_salt) "
-		                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-		       
-		        String insertUserRoleSQL = "INSERT INTO USERROLES (user_id, role_id) VALUES (?, ?)";
-
-		        PreparedStatement insertUserStmt = connection.prepareStatement(insertUserSQL, Statement.RETURN_GENERATED_KEYS);
-		        PreparedStatement insertUserRoleStmt = connection.prepareStatement(insertUserRoleSQL);
-
-		        
-		        for (int i = 1; i <= 20; i++) {
-		            String firstName = firstNames[random.nextInt(firstNames.length)];
-		            String lastName = lastNames[random.nextInt(lastNames.length)];
-		            String username = firstName.toLowerCase() + i;
-		            String email = username + "@example.com";
-		            String hashedPassword = "password" + i; // Plaintext passwords for testing
-		            String passwordSalt = "salt" + i; // Plaintext salt for testing
-
-		            
-		            insertUserStmt.setString(1, username);
-		            insertUserStmt.setString(2, email);
-		            insertUserStmt.setString(3, hashedPassword);
-		            insertUserStmt.setString(4, firstName);
-		            insertUserStmt.setNull(5, java.sql.Types.VARCHAR); // Null for middle_name
-		            insertUserStmt.setString(6, lastName);
-		            insertUserStmt.setString(7, passwordSalt);
-		            insertUserStmt.executeUpdate();
-
-		            // Retrieve the generated user ID
-		            ResultSet generatedKeys = insertUserStmt.getGeneratedKeys();
-		            if (generatedKeys.next()) {
-		                int userId = generatedKeys.getInt(1);
-
-		                // Randomly assign roles to users
-		                int numRoles = random.nextInt(3) + 1; // Each user gets between 1 to 3 roles
-		                Set<Integer> assignedRoles = new HashSet<>();
-		                for (int j = 0; j < numRoles; j++) {
-		                    int roleId;
-		                    do {
-		                    	roleId= random.nextInt(3) + 1; // Role ID between 1 (Admin) and 3 (Student)
-		                    } while(assignedRoles.contains(roleId));
-		                    assignedRoles.add(roleId);
-		                    insertUserRoleStmt.setInt(1, userId);
-		                    insertUserRoleStmt.setInt(2, roleId);
-		                    insertUserRoleStmt.executeUpdate();
-		                }
-		            }
-		        }
-
-		        insertUserStmt.close();
-		        insertUserRoleStmt.close();
-
-		        System.out.println("Inserted 20 fake users with random roles into the database.");
-
-		    } catch (SQLException e) {
-		        e.printStackTrace();
-		    }
-		}
+		
 		
 		private void createTables() throws SQLException {
 			//Creates these tables if they don't exist
@@ -250,7 +172,7 @@ class DatabaseController {
 			
 			
 			System.out.println("All tables created");
-			//fakePeople(); //TODO THIS IS FOR TESTING, REMOVE
+			
 			
 			//TODO Here
 			//Populate topicsTable and ComfortLevelsTable 

@@ -89,7 +89,6 @@ public class GUIController implements EventHandler<ActionEvent>{
 	private TextField enterUserID; // Used for all scenes related to admin so far 
 
 	    // UI components for inviteUser
-    private String giveInvCode;   	// Give invite code - String for testing
     private Button confirmRoles;	// Confirm roles given
     private CheckBox selAdmin;   	// Select admin
     private CheckBox selInstructor; // Select Instructor
@@ -97,7 +96,6 @@ public class GUIController implements EventHandler<ActionEvent>{
     private Alert codeAlert;
     
     // UI components for resetUserPass 
-    private String date;   			// String for testing
     private Button resetPass; 		// Button to reset password 
     
     // UI components for changePass   
@@ -141,8 +139,8 @@ public class GUIController implements EventHandler<ActionEvent>{
     public void initialize(Stage mainStage, StudentHelpApp helpApp) {
     	this.mainStage = mainStage;
 		this.helpApp = helpApp;
-		//switchScene(login_page()); // Placeholder 
-		switchScene(adminHomePage());
+		switchScene(login_page()); // Placeholder 
+		//switchScene(adminHomePage()); //Used sometimes for testing
     }
     
 
