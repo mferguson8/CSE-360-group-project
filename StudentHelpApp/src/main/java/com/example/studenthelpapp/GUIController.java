@@ -153,7 +153,8 @@ public class GUIController implements EventHandler<ActionEvent>{
     public void initialize(Stage mainStage, StudentHelpApp helpApp) {
     	this.mainStage = mainStage;
 		this.helpApp = helpApp;
-		switchScene(login_page()); // Placeholder 
+		//switchScene(login_page()); // Placeholder 
+		switchScene(adminHomePage());
     }
     
     /**
@@ -163,6 +164,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 		//For when a user has submitted a valid invite code,
 		//We allow them to enter a username and password (has to match twice)
+    	this.inviteCode = invite_code; //Keep this
     	setTitle("Create Account");
 
 		Label labelCreateAccount = new Label("Create An Account!");
@@ -291,7 +293,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 		enterEmail.setMaxWidth(windowX - 20);
 		enterEmail.setMinHeight(30);
 		
-		Label labelFirstName = new Label("Enter the username here: ");
+		Label labelFirstName = new Label("Enter your first name: ");
 		setupLabelUI(labelFirstName, "Arial", 12, windowX, 
 				Pos.BASELINE_LEFT, windowX, 30);
 		
@@ -428,7 +430,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 		setupButtonUI(deleteUser, "Delete a User", 200, Pos.CENTER, (2*windowX/3) - 60, (windowY/2) - 50);
 		deleteUser.setOnAction(this);
 		
-		Label labelAddRole= new Label("Permanently delete a user: ");
+		Label labelAddRole= new Label("Add a role to a user: ");
 		setupLabelUI(labelAddRole, "Arial", 12, windowX, 
 				Pos.BASELINE_LEFT, (windowX/6) - 60, (3*windowY/4) - 70);
 		
@@ -436,7 +438,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 		setupButtonUI(addRoleToUser, "Add Role To User", 200, Pos.CENTER, (windowX/6) - 60, (3*windowY/4) - 50);
 		addRoleToUser.setOnAction(this);
 		
-		Label labelRemoveRole = new Label("Permanently delete a user: ");
+		Label labelRemoveRole = new Label("Remove a role from a user: ");
 		setupLabelUI(labelRemoveRole, "Arial", 12, windowX, 
 				Pos.BASELINE_LEFT, (2*windowX/3) - 60, (3*windowY/4) - 70);
 		
@@ -678,9 +680,9 @@ public class GUIController implements EventHandler<ActionEvent>{
 		enterUserID = new TextField();
 		setupTextUI(enterUserID, "Arial", 12, windowX - 20, Pos.BASELINE_LEFT, 10, 70 , "Enter User ID: ");
 		
-		deleteUser = new Button();
-		setupButtonUI(deleteUser, "Delete", 100, Pos.CENTER, (windowX/2) - 50, 100);
-		deleteUser.setOnAction(this);
+		deleteUserButton = new Button();
+		setupButtonUI(deleteUserButton, "Delete", 100, Pos.CENTER, (windowX/2) - 50, 100);
+		deleteUserButton.setOnAction(this);
 		
 		backButton = new Button();
 		setupButtonUI(backButton, "Back", 50, Pos.CENTER, 5, windowY - 30);
@@ -689,7 +691,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 
 		Pane deleteUserRoot = new Pane();
 
-		deleteUserRoot.getChildren().addAll(labelUserID, labelDeletePass, enterUserID, deleteUser, backButton);
+		deleteUserRoot.getChildren().addAll(labelUserID, labelDeletePass, enterUserID, deleteUserButton, backButton);
 
 		Scene deleteUserScene = new Scene(deleteUserRoot, windowX, windowY);
 		return deleteUserScene;
@@ -784,7 +786,7 @@ public class GUIController implements EventHandler<ActionEvent>{
 		removeStudent.setLayoutY(140);
 
 		removeRole = new Button();
-		setupButtonUI(removeRole, "Add", 50, Pos.CENTER, 20, 170);
+		setupButtonUI(removeRole, "Remove", 50, Pos.CENTER, 20, 170);
 		removeRole.setOnAction(this);
 
 		backButton = new Button();
@@ -879,7 +881,8 @@ public class GUIController implements EventHandler<ActionEvent>{
 				createPassword.clear();
 				confirmPassword.clear();
 				//Calls createUser for logic handling
-				helpApp.createUser(this.inviteCode, username, password1);
+				String code = this.inviteCode;
+				helpApp.createUser(code, username, password1);
 				this.inviteCode = null; 
 				//Removes storage of inviteCode, no longer needed in GUIController at this point
 			}
@@ -957,33 +960,35 @@ public class GUIController implements EventHandler<ActionEvent>{
             			Name.NameResult.Position.LAST,
             			Name.NameResult.Position.PREFERRED};
             }
+
+           
+        	StringBuilder nameError = new StringBuilder();
+        	//StringBuilder to build a potentially long string listing all the requirements not met.
+        	nameError.append("Names don't meet the following requirements:");
+            for(Name.NameResult.Position currentPosition: positionsToCheck) {
+        		switch(name_check.checkNV(currentPosition)) {
+            		case Name.NameResult.Status.START_NUM:
+            			nameError.append("First name starts with numbers; ");
+            			break;
+            		case Name.NameResult.Status.HAS_SPEC:
+            			nameError.append("First name contains special characters; ");
+            			break;
+            		case Name.NameResult.Status.DNE:
+            			nameError.append("ERROR: First name does not exist; ");
+            			break;
+            		case Name.NameResult.Status.OOPN:
+            			nameError.append("First name has an out of place number; ");
+            			break;
+            		case Name.NameResult.Status.SUCCESS:
+            		default:
+            	}
+            }
             Name names = name_check.getName();
-            if(names == null) {
-            	StringBuilder nameError = new StringBuilder();
-            	//StringBuilder to build a potentially long string listing all the requirements not met.
-            	nameError.append("Names don't meet the following requirements:");
-	            for(Name.NameResult.Position currentPosition: positionsToCheck) {
-            		switch(name_check.checkNV(currentPosition)) {
-	            		case Name.NameResult.Status.START_NUM:
-	            			nameError.append("First name starts with numbers; ");
-	            			break;
-	            		case Name.NameResult.Status.HAS_SPEC:
-	            			nameError.append("First name contains special characters; ");
-	            			break;
-	            		case Name.NameResult.Status.DNE:
-	            			nameError.append("ERROR: First name does not exist; ");
-	            			break;
-	            		case Name.NameResult.Status.OOPN:
-	            			nameError.append("First name has an out of place number; ");
-	            			break;
-	            		case Name.NameResult.Status.SUCCESS:
-	            		default:
-	            	}
-	            }
-	          showAlert(nameError.toString()); 
-	          return;
-	          //This might be really long and I'm not sure how showAlert will deal with that.
-	          //TODO: Test this.
+	        if(names == null) {
+	        	showAlert(nameError.toString()); 
+	        	return;
+	            //This might be really long and I'm not sure how showAlert will deal with that.
+	            //TODO: Test this.
             }
             
             enterEmail.clear();
